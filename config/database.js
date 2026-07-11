@@ -1,5 +1,11 @@
+const dns = require('node:dns');
 const mongoose = require('mongoose');
 const config = require('./config');
+
+// Em algumas hospedagens (como o Render), a resolução de DNS prefere IPv6,
+// o que pode causar falhas de handshake TLS ao conectar no MongoDB Atlas.
+// Forçar IPv4 primeiro evita esse problema.
+dns.setDefaultResultOrder('ipv4first');
 
 async function connectDatabase() {
   mongoose.set('strictQuery', true);

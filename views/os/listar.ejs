@@ -1,0 +1,48 @@
+<div class="flex-entre mb-16">
+  <div class="barra-filtros" style="flex:1;">
+    <form method="GET" action="/ordens-servico">
+      <input type="search" name="busca" placeholder="Buscar por cliente ou placa..." value="<%= busca %>">
+      <select name="status">
+        <option value="">Todos os status</option>
+        <% statusLista.forEach(s => { %>
+          <option value="<%= s %>" <%= status === s ? 'selected' : '' %>><%= s.replace('_',' ') %></option>
+        <% }) %>
+      </select>
+      <button type="submit" class="botao botao-secundario">Filtrar</button>
+    </form>
+  </div>
+  <a href="/ordens-servico/novo" class="botao botao-primario">+ Nova OS</a>
+</div>
+
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Nº</th><th>Cliente</th><th>Moto</th><th>Mecânico</th><th>Status</th><th>Total</th><th>Data</th></tr></thead>
+      <tbody>
+        <% if (!ordens.length) { %>
+          <tr><td colspan="7" class="estado-vazio">Nenhuma Ordem de Serviço encontrada.</td></tr>
+        <% } %>
+        <% const mapaBadge = { recebida:'badge-cinza', em_analise:'badge-azul', aguardando_aprovacao:'badge-amarelo', em_manutencao:'badge-roxo', finalizada:'badge-verde', entregue:'badge-verde', cancelada:'badge-vermelho' }; %>
+        <% ordens.forEach(os => { %>
+          <tr>
+            <td><a href="/ordens-servico/<%= os._id %>">#<%= os.numero %></a></td>
+            <td><%= os.cliente?.nome || '-' %></td>
+            <td><%= os.moto?.marca %> <%= os.moto?.modelo %> (<%= os.moto?.placa %>)</td>
+            <td><%= os.mecanico?.nome || '-' %></td>
+            <td><span class="badge <%= mapaBadge[os.status] %>"><%= os.status.replace('_',' ') %></span></td>
+            <td><%= os.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><%= new Date(os.createdAt).toLocaleDateString('pt-BR') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (totalPaginas > 1) { %>
+  <div class="paginacao">
+    <% for (let i = 1; i <= totalPaginas; i++) { %>
+      <a href="/ordens-servico?status=<%= status %>&busca=<%= busca %>&pagina=<%= i %>" class="<%= i === paginaAtual ? 'ativo' : '' %>"><%= i %></a>
+    <% } %>
+  </div>
+<% } %>

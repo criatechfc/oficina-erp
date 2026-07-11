@@ -1,0 +1,30 @@
+<div class="tela-login">
+  <div class="caixa-login">
+    <div class="logo-login">
+      <span class="icone-moto">🏍️</span>
+      <span>Oficina ERP</span>
+    </div>
+    <h1>Entrar</h1>
+    <p class="subtitulo">Acesse o painel de gestão da oficina</p>
+
+    <% if (mensagemSucesso) { %><div class="alerta alerta-sucesso"><%= mensagemSucesso %></div><% } %>
+    <% if (mensagemErro) { %><div class="alerta alerta-erro"><%= mensagemErro %></div><% } %>
+
+    <form action="/login" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-grupo">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required autofocus>
+      </div>
+      <div class="form-grupo">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" required>
+      </div>
+      <button type="submit" class="botao botao-primario botao-bloco">Entrar</button>
+    </form>
+
+    <p class="texto-pequeno texto-suave" style="text-align:center; margin-top:18px;">
+      <a href="/esqueci-senha">Esqueci minha senha</a>
+    </p>
+  </div>
+</div>

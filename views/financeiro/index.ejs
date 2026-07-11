@@ -1,0 +1,66 @@
+<div class="flex-entre mb-16">
+  <div class="barra-filtros" style="flex:1;">
+    <form method="GET" action="/financeiro">
+      <select name="tipo" onchange="this.form.submit()">
+        <option value="pagar" <%= tipo === 'pagar' ? 'selected' : '' %>>Contas a Pagar</option>
+        <option value="receber" <%= tipo === 'receber' ? 'selected' : '' %>>Contas a Receber</option>
+      </select>
+      <select name="status" onchange="this.form.submit()">
+        <option value="">Todos os status</option>
+        <option value="pendente" <%= status === 'pendente' ? 'selected' : '' %>>Pendente</option>
+        <option value="pago" <%= status === 'pago' ? 'selected' : '' %>>Pago</option>
+        <option value="vencido" <%= status === 'vencido' ? 'selected' : '' %>>Vencido</option>
+        <option value="cancelado" <%= status === 'cancelado' ? 'selected' : '' %>>Cancelado</option>
+      </select>
+    </form>
+  </div>
+  <a href="/financeiro/novo?tipo=<%= tipo %>" class="botao botao-primario">+ Nova Conta</a>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: 1fr 1fr;">
+  <div class="card card-indicador">
+    <div><div class="rotulo">Total a pagar (pendente)</div><div class="valor"><%= totalPendentePagar.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+    <div class="icone-card bg-vermelho">📉</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Total a receber (pendente)</div><div class="valor"><%= totalPendenteReceber.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+    <div class="icone-card bg-verde">📈</div>
+  </div>
+</div>
+
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Descrição</th><th>Categoria</th><th>Vencimento</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <% if (!contas.length) { %>
+          <tr><td colspan="6" class="estado-vazio">Nenhuma conta encontrada.</td></tr>
+        <% } %>
+        <% const mapaStatusConta = { pendente:'badge-amarelo', pago:'badge-verde', vencido:'badge-vermelho', cancelado:'badge-cinza' }; %>
+        <% contas.forEach(c => { %>
+          <tr>
+            <td><%= c.descricao %><br><span class="texto-pequeno texto-suave"><%= c.fornecedor?.empresa || c.cliente?.nome || '' %></span></td>
+            <td><%= c.categoria %></td>
+            <td><%= new Date(c.vencimento).toLocaleDateString('pt-BR') %></td>
+            <td><%= c.valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><span class="badge <%= mapaStatusConta[c.status] %>"><%= c.status %></span></td>
+            <td>
+              <% if (c.status === 'pendente' || c.status === 'vencido') { %>
+                <div class="flex gap-8">
+                  <form action="/financeiro/<%= c._id %>/pagar" method="POST" data-confirmar="Marcar esta conta como paga?">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="botao botao-sucesso botao-pequeno">Pagar</button>
+                  </form>
+                  <form action="/financeiro/<%= c._id %>/cancelar" method="POST" data-confirmar="Cancelar esta conta?">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="botao botao-perigo botao-pequeno">Cancelar</button>
+                  </form>
+                </div>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

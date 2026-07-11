@@ -1,0 +1,88 @@
+<div class="flex-entre mb-16">
+  <div>
+    <h2 class="mt-0 mb-0">Ordem de Serviço Nº <%= os.numero %></h2>
+    <p class="texto-suave texto-pequeno mt-0"><%= new Date(os.createdAt).toLocaleString('pt-BR') %></p>
+  </div>
+  <div class="flex gap-8">
+    <% if (os.cliente.whatsapp) { %>
+      <% const msgWhats = os.status === 'em_manutencao' ? montarMensagemConfirmacaoServico(os.cliente, os) : montarMensagemMotoPronta(os.cliente, os.moto); %>
+      <a href="<%= construirLinkWhatsApp(os.cliente.whatsapp, msgWhats) %>" target="_blank" class="botao botao-sucesso">📲 Avisar cliente no WhatsApp</a>
+    <% } %>
+    <a href="/ordens-servico/<%= os._id %>/pdf" target="_blank" class="botao botao-secundario">🖨️ Imprimir / PDF</a>
+  </div>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: 2fr 1fr;">
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Detalhes</h2></div>
+    <div class="painel-corpo">
+      <p><strong>Cliente:</strong> <a href="/clientes/<%= os.cliente._id %>"><%= os.cliente.nome %></a> — <%= os.cliente.telefone %></p>
+      <p><strong>Moto:</strong> <a href="/motos/<%= os.moto._id %>"><%= os.moto.marca %> <%= os.moto.modelo %></a> — Placa <%= os.moto.placa %></p>
+      <p><strong>Mecânico:</strong> <%= os.mecanico?.nome || '-' %></p>
+      <p><strong>Problema informado:</strong><br><%= os.problemaInformado %></p>
+      <% if (os.diagnostico) { %><p><strong>Diagnóstico:</strong><br><%= os.diagnostico %></p><% } %>
+
+      <h3>Peças utilizadas</h3>
+      <% if (!os.pecasUtilizadas.length) { %><p class="texto-suave texto-pequeno">Nenhuma peça utilizada.</p><% } %>
+      <table>
+        <% os.pecasUtilizadas.forEach(p => { %>
+          <tr><td><%= p.quantidade %>x <%= p.nome %></td><td class="texto-centro"><%= p.precoUnitario.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td><td class="texto-centro negrito"><%= (p.quantidade * p.precoUnitario).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td></tr>
+        <% }) %>
+      </table>
+
+      <h3>Serviços realizados</h3>
+      <% if (!os.servicosRealizados.length) { %><p class="texto-suave texto-pequeno">Nenhum serviço registrado.</p><% } %>
+      <table>
+        <% os.servicosRealizados.forEach(s => { %>
+          <tr><td><%= s.descricao %></td><td class="texto-centro negrito"><%= s.valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td></tr>
+        <% }) %>
+      </table>
+
+      <div style="text-align:right; margin-top:16px;">
+        <p class="texto-suave">Valor peças: <%= os.valorPecas.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+        <p class="texto-suave">Mão de obra: <%= os.valorMaoDeObra.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+        <p class="texto-suave">Desconto: <%= os.desconto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+        <p style="font-size:20px;" class="negrito">Total: <%= os.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="painel">
+      <div class="painel-cabecalho"><h2>Status</h2></div>
+      <div class="painel-corpo">
+        <form action="/ordens-servico/<%= os._id %>/status" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="form-grupo">
+            <label for="status">Alterar status</label>
+            <select id="status" name="status">
+              <% statusLista.forEach(s => { %>
+                <option value="<%= s %>" <%= os.status === s ? 'selected' : '' %>><%= s.replace('_',' ') %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-grupo">
+            <label for="observacao">Observação</label>
+            <textarea id="observacao" name="observacao"></textarea>
+          </div>
+          <button type="submit" class="botao botao-primario botao-bloco">Atualizar status</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho"><h2>Histórico</h2></div>
+      <div class="painel-corpo">
+        <ul class="timeline">
+          <% os.historicoStatus.slice().reverse().forEach(h => { %>
+            <li>
+              <strong><%= h.status.replace('_',' ') %></strong>
+              <p class="texto-suave texto-pequeno mb-0"><%= new Date(h.data).toLocaleString('pt-BR') %> — <%= h.usuario?.nome || '-' %></p>
+              <% if (h.observacao) { %><p class="texto-pequeno mb-0"><%= h.observacao %></p><% } %>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

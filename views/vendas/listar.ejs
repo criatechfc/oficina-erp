@@ -1,0 +1,46 @@
+<div class="flex-entre mb-16">
+  <div class="barra-filtros" style="flex:1;">
+    <form method="GET" action="/vendas">
+      <select name="status" onchange="this.form.submit()">
+        <option value="">Todos os status</option>
+        <option value="orcamento" <%= status === 'orcamento' ? 'selected' : '' %>>Orçamento</option>
+        <option value="confirmada" <%= status === 'confirmada' ? 'selected' : '' %>>Confirmada</option>
+        <option value="convertida_os" <%= status === 'convertida_os' ? 'selected' : '' %>>Convertida em OS</option>
+        <option value="cancelada" <%= status === 'cancelada' ? 'selected' : '' %>>Cancelada</option>
+      </select>
+    </form>
+  </div>
+  <a href="/vendas/novo" class="botao botao-primario">+ Nova Venda / Orçamento</a>
+</div>
+
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Nº</th><th>Cliente</th><th>Vendedor</th><th>Total</th><th>Status</th><th>Data</th></tr></thead>
+      <tbody>
+        <% if (!vendas.length) { %>
+          <tr><td colspan="6" class="estado-vazio">Nenhuma venda encontrada.</td></tr>
+        <% } %>
+        <% const mapaStatusVenda = { orcamento:'badge-amarelo', confirmada:'badge-verde', convertida_os:'badge-azul', cancelada:'badge-vermelho' }; %>
+        <% vendas.forEach(v => { %>
+          <tr>
+            <td><a href="/vendas/<%= v._id %>">#<%= v.numero %></a></td>
+            <td><%= v.cliente?.nome || 'Consumidor final' %></td>
+            <td><%= v.vendedor?.nome || '-' %></td>
+            <td><%= v.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><span class="badge <%= mapaStatusVenda[v.status] %>"><%= v.status.replace('_',' ') %></span></td>
+            <td><%= new Date(v.createdAt).toLocaleDateString('pt-BR') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (totalPaginas > 1) { %>
+  <div class="paginacao">
+    <% for (let i = 1; i <= totalPaginas; i++) { %>
+      <a href="/vendas?status=<%= status %>&pagina=<%= i %>" class="<%= i === paginaAtual ? 'ativo' : '' %>"><%= i %></a>
+    <% } %>
+  </div>
+<% } %>

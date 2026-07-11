@@ -1,0 +1,95 @@
+<div class="painel">
+  <div class="painel-corpo">
+    <form action="/ordens-servico" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="cliente">Cliente *</label>
+          <select id="cliente" name="cliente" required onchange="carregarMotosDoCliente(this.value, 'moto', '/ordens-servico/motos-por-cliente')">
+            <option value="">Selecione o cliente</option>
+            <% clientes.forEach(c => { %>
+              <option value="<%= c._id %>" <%= clienteSelecionado == c._id ? 'selected' : '' %>><%= c.nome %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="moto">Moto *</label>
+          <select id="moto" name="moto" required>
+            <option value="">Selecione o cliente primeiro</option>
+            <% motos.forEach(m => { %>
+              <option value="<%= m._id %>"><%= m.marca %> <%= m.modelo %> - <%= m.placa %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="mecanico">Mecânico responsável</label>
+          <select id="mecanico" name="mecanico">
+            <option value="">Selecione</option>
+            <% mecanicos.forEach(m => { %><option value="<%= m._id %>"><%= m.nome %></option><% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="quilometragemEntrada">Quilometragem de entrada</label>
+          <input type="number" id="quilometragemEntrada" name="quilometragemEntrada">
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label for="problemaInformado">Problema informado *</label>
+        <textarea id="problemaInformado" name="problemaInformado" required></textarea>
+      </div>
+
+      <div class="form-grupo">
+        <label for="diagnostico">Diagnóstico</label>
+        <textarea id="diagnostico" name="diagnostico"></textarea>
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--cor-borda); margin:20px 0;">
+
+      <div class="flex-entre mb-16">
+        <h3 class="mb-0">Peças utilizadas</h3>
+        <button type="button" class="botao botao-secundario botao-pequeno" onclick="adicionarItemDinamico('itensPecas', 'templatePeca')">+ Adicionar peça</button>
+      </div>
+      <div id="itensPecas" class="linha-itens mb-16"></div>
+
+      <div class="flex-entre mb-16">
+        <h3 class="mb-0">Serviços realizados</h3>
+        <button type="button" class="botao botao-secundario botao-pequeno" onclick="adicionarItemDinamico('itensServicos', 'templateServico')">+ Adicionar serviço</button>
+      </div>
+      <div id="itensServicos" class="linha-itens mb-16"></div>
+
+      <div class="form-grupo" style="max-width:220px;">
+        <label for="desconto">Desconto (R$)</label>
+        <input type="number" step="0.01" id="desconto" name="desconto" value="0">
+      </div>
+
+      <div class="flex gap-12">
+        <button type="submit" class="botao botao-primario">Criar Ordem de Serviço</button>
+        <a href="/ordens-servico" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<template id="templatePeca">
+  <div class="item-dinamico">
+    <select name="pecaId" onchange="preencherPrecoPeca(this)">
+      <option value="">Selecione a peça</option>
+      <% pecas.forEach(p => { %>
+        <option value="<%= p._id %>" data-preco="<%= p.precoVenda %>"><%= p.nome %> (estoque: <%= p.quantidade %>)</option>
+      <% }) %>
+    </select>
+    <input type="number" name="pecaQuantidade" placeholder="Qtd" min="1" value="1">
+    <input type="number" step="0.01" class="campo-preco" placeholder="Preço unit." readonly>
+    <button type="button" class="remover-item" onclick="removerItemDinamico(this)">✕</button>
+  </div>
+</template>
+
+<template id="templateServico">
+  <div class="item-dinamico item-dinamico-servico">
+    <input type="text" name="servicoDescricao" placeholder="Descrição do serviço">
+    <input type="number" step="0.01" name="servicoValor" placeholder="Valor (R$)">
+    <button type="button" class="remover-item" onclick="removerItemDinamico(this)">✕</button>
+  </div>
+</template>

@@ -1,0 +1,48 @@
+<div class="flex-entre mb-16">
+  <div class="barra-filtros" style="flex:1;">
+    <form method="GET" action="/motos">
+      <input type="search" name="busca" placeholder="Buscar por placa, marca, modelo..." value="<%= busca %>">
+      <button type="submit" class="botao botao-secundario">Buscar</button>
+    </form>
+  </div>
+  <a href="/motos/novo" class="botao botao-primario">+ Nova Moto</a>
+</div>
+
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Placa</th><th>Marca / Modelo</th><th>Cliente</th><th>Ano</th><th>KM</th><th></th></tr></thead>
+      <tbody>
+        <% if (!motos.length) { %>
+          <tr><td colspan="6" class="estado-vazio">Nenhuma moto encontrada.</td></tr>
+        <% } %>
+        <% motos.forEach(m => { %>
+          <tr>
+            <td><a href="/motos/<%= m._id %>"><%= m.placa %></a></td>
+            <td><%= m.marca %> <%= m.modelo %></td>
+            <td><%= m.cliente?.nome || '-' %></td>
+            <td><%= m.ano || '-' %></td>
+            <td><%= m.quilometragem %> km</td>
+            <td>
+              <div class="flex gap-8">
+                <a href="/motos/<%= m._id %>/editar" class="botao botao-secundario botao-pequeno">Editar</a>
+                <form action="/motos/<%= m._id %>?_method=DELETE" method="POST" data-confirmar="Remover esta moto?">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="botao botao-perigo botao-pequeno">Excluir</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (totalPaginas > 1) { %>
+  <div class="paginacao">
+    <% for (let i = 1; i <= totalPaginas; i++) { %>
+      <a href="/motos?busca=<%= busca %>&pagina=<%= i %>" class="<%= i === paginaAtual ? 'ativo' : '' %>"><%= i %></a>
+    <% } %>
+  </div>
+<% } %>

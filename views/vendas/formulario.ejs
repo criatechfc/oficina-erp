@@ -1,0 +1,88 @@
+<div class="painel">
+  <div class="painel-corpo">
+    <form action="/vendas" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="cliente">Cliente</label>
+          <select id="cliente" name="cliente">
+            <option value="">Consumidor final</option>
+            <% clientes.forEach(c => { %><option value="<%= c._id %>"><%= c.nome %></option><% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="formaPagamento">Forma de pagamento</label>
+          <select id="formaPagamento" name="formaPagamento">
+            <option value="dinheiro">Dinheiro</option>
+            <option value="pix">Pix</option>
+            <option value="cartao_debito">Cartão débito</option>
+            <option value="cartao_credito">Cartão crédito</option>
+            <option value="boleto">Boleto</option>
+            <option value="transferencia">Transferência</option>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="desconto">Desconto (R$)</label>
+          <input type="number" step="0.01" id="desconto" name="desconto" value="0">
+        </div>
+      </div>
+
+      <div class="flex-entre mb-16">
+        <h3 class="mb-0">Itens</h3>
+        <div class="flex gap-8">
+          <button type="button" class="botao botao-secundario botao-pequeno" onclick="adicionarItemDinamico('itensVenda', 'templateItemPeca')">+ Peça</button>
+          <button type="button" class="botao botao-secundario botao-pequeno" onclick="adicionarItemDinamico('itensVenda', 'templateItemServico')">+ Serviço</button>
+        </div>
+      </div>
+      <div id="itensVenda" class="linha-itens mb-16"></div>
+
+      <div class="form-grupo">
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" name="observacoes"></textarea>
+      </div>
+
+      <div class="flex gap-12">
+        <button type="submit" name="finalizarComoVenda" value="0" class="botao botao-secundario">Salvar como Orçamento</button>
+        <button type="submit" name="finalizarComoVenda" value="1" class="botao botao-primario">Finalizar Venda</button>
+        <a href="/vendas" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<template id="templateItemPeca">
+  <div class="item-dinamico">
+    <input type="hidden" name="itemTipo" value="peca">
+    <select name="itemPecaId" onchange="preencherDescricaoEPreco(this)">
+      <option value="">Selecione a peça</option>
+      <% pecas.forEach(p => { %>
+        <option value="<%= p._id %>" data-nome="<%= p.nome %>" data-preco="<%= p.precoVenda %>">(estoque: <%= p.quantidade %>)</option>
+      <% }) %>
+    </select>
+    <input type="hidden" name="itemDescricao" class="campo-descricao">
+    <input type="number" name="itemQuantidade" placeholder="Qtd" min="1" value="1">
+    <input type="number" step="0.01" name="itemPreco" class="campo-preco" placeholder="Preço unit.">
+    <button type="button" class="remover-item" onclick="removerItemDinamico(this)">✕</button>
+  </div>
+</template>
+
+<template id="templateItemServico">
+  <div class="item-dinamico item-dinamico-servico">
+    <input type="hidden" name="itemTipo" value="servico">
+    <input type="text" name="itemDescricao" placeholder="Descrição do serviço">
+    <input type="number" step="0.01" name="itemPreco" placeholder="Valor (R$)">
+    <input type="hidden" name="itemQuantidade" value="1">
+    <button type="button" class="remover-item" onclick="removerItemDinamico(this)">✕</button>
+  </div>
+</template>
+
+<script>
+  function preencherDescricaoEPreco(select) {
+    const opcao = select.options[select.selectedIndex];
+    const linha = select.closest('.item-dinamico');
+    if (!linha) return;
+    linha.querySelector('.campo-descricao').value = opcao.getAttribute('data-nome') || '';
+    linha.querySelector('.campo-preco').value = opcao.getAttribute('data-preco') || '';
+  }
+</script>

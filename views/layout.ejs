@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= titulo %> · <%= configuracao?.nomeOficina || 'Oficina ERP' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <% if (typeof usuarioLogado !== 'undefined' && usuarioLogado) { %>
+      <%- include('partials/sidebar') %>
+    <% } %>
+
+    <div class="conteudo" style="<%= typeof usuarioLogado === 'undefined' || !usuarioLogado ? 'margin-left:0' : '' %>">
+      <% if (typeof usuarioLogado !== 'undefined' && usuarioLogado) { %>
+        <%- include('partials/topbar') %>
+      <% } %>
+
+      <main class="pagina">
+        <% if (mensagemSucesso) { %>
+          <div class="alerta alerta-sucesso"><%= mensagemSucesso %></div>
+        <% } %>
+        <% if (mensagemErro) { %>
+          <div class="alerta alerta-erro"><%= mensagemErro %></div>
+        <% } %>
+
+        <%- body %>
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

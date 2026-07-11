@@ -1,0 +1,21 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0">Relatório de Serviços</h2>
+  <a href="/relatorios/servicos?exportar=excel" class="botao botao-secundario">⬇️ Exportar Excel</a>
+</div>
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Nº OS</th><th>Cliente</th><th>Moto</th><th>Mecânico</th><th>Total</th></tr></thead>
+      <tbody>
+        <% ordens.forEach(o => { %>
+          <tr>
+            <td>#<%= o.numero %></td><td><%= o.cliente?.nome %></td>
+            <td><%= o.moto?.modelo %> (<%= o.moto?.placa %>)</td>
+            <td><%= o.mecanico?.nome || '-' %></td>
+            <td><%= o.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

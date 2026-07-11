@@ -1,0 +1,56 @@
+<div class="flex-entre mb-16">
+  <div>
+    <h2 class="mt-0 mb-0"><%= cliente.nome %></h2>
+    <p class="texto-suave texto-pequeno mt-0"><%= cliente.telefone || '-' %> · <%= cliente.email || '-' %></p>
+  </div>
+  <a href="/clientes/<%= cliente._id %>/editar" class="botao botao-secundario">Editar</a>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: 1fr 1fr 1fr;">
+  <div class="card"><span class="texto-suave texto-pequeno">CPF</span><p class="negrito"><%= cliente.cpf || '-' %></p></div>
+  <div class="card"><span class="texto-suave texto-pequeno">Endereço</span><p class="negrito"><%= cliente.endereco || '-' %>, <%= cliente.cidade || '' %>/<%= cliente.estado || '' %></p></div>
+  <div class="card"><span class="texto-suave texto-pequeno">WhatsApp</span><p class="negrito"><%= cliente.whatsapp || '-' %></p></div>
+</div>
+
+<div class="painel">
+  <div class="painel-cabecalho">
+    <h2>Motos (<%= motos.length %>)</h2>
+    <a href="/motos/novo" class="texto-pequeno">+ Nova moto</a>
+  </div>
+  <div class="painel-corpo">
+    <% if (!motos.length) { %>
+      <p class="texto-suave texto-pequeno">Nenhuma moto cadastrada para este cliente.</p>
+    <% } %>
+    <div class="grid-cards">
+      <% motos.forEach(m => { %>
+        <a href="/motos/<%= m._id %>" class="card">
+          <strong><%= m.marca %> <%= m.modelo %></strong>
+          <p class="texto-suave texto-pequeno mb-0">Placa: <%= m.placa %> · <%= m.ano || '-' %></p>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<div class="painel">
+  <div class="painel-cabecalho"><h2>Histórico de Ordens de Serviço</h2></div>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Nº</th><th>Moto</th><th>Status</th><th>Total</th><th>Data</th></tr></thead>
+      <tbody>
+        <% if (!ordensServico.length) { %>
+          <tr><td colspan="5" class="estado-vazio">Nenhuma Ordem de Serviço registrada.</td></tr>
+        <% } %>
+        <% ordensServico.forEach(os => { %>
+          <tr>
+            <td><a href="/ordens-servico/<%= os._id %>">#<%= os.numero %></a></td>
+            <td><%= os.moto?.marca %> <%= os.moto?.modelo %> (<%= os.moto?.placa %>)</td>
+            <td><span class="badge badge-azul"><%= os.status.replace('_',' ') %></span></td>
+            <td><%= os.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><%= new Date(os.createdAt).toLocaleDateString('pt-BR') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

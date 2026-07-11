@@ -1,0 +1,35 @@
+<div class="painel">
+  <div class="painel-cabecalho"><h2>Revisões pendentes</h2></div>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Cliente</th><th>Moto</th><th>Item</th><th>Próxima KM</th><th>Próxima data</th><th></th></tr></thead>
+      <tbody>
+        <% if (!revisoes.length) { %>
+          <tr><td colspan="6" class="estado-vazio">Nenhuma revisão pendente.</td></tr>
+        <% } %>
+        <% revisoes.forEach(r => { %>
+          <tr>
+            <td><%= r.moto?.cliente?.nome || '-' %></td>
+            <td><%= r.moto?.marca %> <%= r.moto?.modelo %> (<%= r.moto?.placa %>)</td>
+            <td><%= r.item.replace('_',' ') %></td>
+            <td><%= r.proximaQuilometragem %> km</td>
+            <td><%= r.proximaData ? new Date(r.proximaData).toLocaleDateString('pt-BR') : '-' %></td>
+            <td>
+              <div class="flex gap-8">
+                <% if (r.moto?.cliente?.whatsapp) { %>
+                  <a href="<%= construirLinkWhatsApp(r.moto.cliente.whatsapp, montarMensagemProximaRevisao(r.moto.cliente, r.moto, r)) %>" target="_blank" class="botao botao-sucesso botao-pequeno">📲</a>
+                <% } %>
+                <form action="/revisoes/<%= r._id %>/concluir" method="POST" data-confirmar="Marcar como concluída?">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="botao botao-secundario botao-pequeno">Concluir</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="texto-suave texto-pequeno">Para registrar uma nova revisão, acesse a página da moto desejada e utilize a opção "Registrar revisão".</p>

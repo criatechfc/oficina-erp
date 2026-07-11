@@ -1,0 +1,29 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0"><%= peca.nome %> — Histórico de movimentações</h2>
+  <a href="/estoque" class="botao botao-secundario">Voltar</a>
+</div>
+
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Data</th><th>Tipo</th><th>Quantidade</th><th>Anterior</th><th>Nova</th><th>Motivo</th><th>Usuário</th></tr></thead>
+      <tbody>
+        <% if (!movimentacoes.length) { %>
+          <tr><td colspan="7" class="estado-vazio">Nenhuma movimentação registrada.</td></tr>
+        <% } %>
+        <% const mapaTipo = { entrada: 'badge-verde', saida: 'badge-vermelho', ajuste_inventario: 'badge-azul' }; %>
+        <% movimentacoes.forEach(m => { %>
+          <tr>
+            <td><%= new Date(m.createdAt).toLocaleString('pt-BR') %></td>
+            <td><span class="badge <%= mapaTipo[m.tipo] %>"><%= m.tipo.replace('_',' ') %></span></td>
+            <td><%= m.quantidade %></td>
+            <td><%= m.quantidadeAnterior %></td>
+            <td><%= m.quantidadeNova %></td>
+            <td><%= m.motivo || '-' %></td>
+            <td><%= m.usuario?.nome || '-' %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

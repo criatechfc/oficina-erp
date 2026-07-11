@@ -1,0 +1,117 @@
+<div class="painel">
+  <div class="painel-corpo">
+    <form action="<%= modo === 'criar' ? '/estoque' : `/estoque/${peca._id}?_method=PUT` %>" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="codigo">Código *</label>
+          <input type="text" id="codigo" name="codigo" required value="<%= peca.codigo || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="codigoBarras">Código de barras</label>
+          <input type="text" id="codigoBarras" name="codigoBarras" value="<%= peca.codigoBarras || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="nome">Nome *</label>
+          <input type="text" id="nome" name="nome" required value="<%= peca.nome || '' %>">
+        </div>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="categoria">Categoria</label>
+          <input type="text" id="categoria" name="categoria" value="<%= peca.categoria || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="marca">Marca</label>
+          <input type="text" id="marca" name="marca" value="<%= peca.marca || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="fornecedor">Fornecedor</label>
+          <select id="fornecedor" name="fornecedor">
+            <option value="">Selecione</option>
+            <% fornecedores.forEach(f => { %>
+              <option value="<%= f._id %>" <%= (peca.fornecedor?._id || peca.fornecedor) == f._id ? 'selected' : '' %>><%= f.empresa %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="localizacao">Localização</label>
+          <input type="text" id="localizacao" name="localizacao" value="<%= peca.localizacao || '' %>">
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" name="descricao"><%= peca.descricao || '' %></textarea>
+      </div>
+
+      <div class="form-linha mb-16">
+        <% if (modo === 'criar') { %>
+        <div class="form-grupo mb-0">
+          <label for="quantidade">Quantidade inicial</label>
+          <input type="number" id="quantidade" name="quantidade" value="0">
+        </div>
+        <% } %>
+        <div class="form-grupo mb-0">
+          <label for="estoqueMinimo">Estoque mínimo *</label>
+          <input type="number" id="estoqueMinimo" name="estoqueMinimo" required value="<%= peca.estoqueMinimo || 0 %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="precoCusto">Preço custo (R$) *</label>
+          <input type="number" step="0.01" id="precoCusto" name="precoCusto" required value="<%= peca.precoCusto || 0 %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="precoVenda">Preço venda (R$) *</label>
+          <input type="number" step="0.01" id="precoVenda" name="precoVenda" required value="<%= peca.precoVenda || 0 %>">
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label for="fotos">Fotos</label>
+        <input type="file" id="fotos" name="fotos" accept="image/*" multiple>
+      </div>
+
+      <% if (peca.fotos && peca.fotos.length) { %>
+        <div class="galeria-fotos mb-16"><% peca.fotos.forEach(f => { %><img src="<%= f %>" alt="Foto"><% }) %></div>
+      <% } %>
+
+      <div class="flex gap-12">
+        <button type="submit" class="botao botao-primario">Salvar</button>
+        <a href="/estoque" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<% if (modo === 'editar') { %>
+<div class="painel">
+  <div class="painel-cabecalho"><h2>Movimentar estoque</h2></div>
+  <div class="painel-corpo">
+    <p class="mb-16">Estoque atual: <span class="badge <%= peca.quantidade <= peca.estoqueMinimo ? 'badge-vermelho' : 'badge-verde' %>"><%= peca.quantidade %> un.</span></p>
+    <form action="/estoque/<%= peca._id %>/movimentar" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="tipo">Tipo</label>
+          <select id="tipo" name="tipo">
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída</option>
+            <option value="ajuste_inventario">Ajuste de inventário</option>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="quantidadeMov">Quantidade</label>
+          <input type="number" id="quantidadeMov" name="quantidade" min="1" required>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="motivo">Motivo</label>
+          <input type="text" id="motivo" name="motivo" placeholder="Ex.: Compra, avaria, inventário...">
+        </div>
+      </div>
+      <button type="submit" class="botao botao-secundario">Registrar movimentação</button>
+    </form>
+  </div>
+</div>
+<% } %>

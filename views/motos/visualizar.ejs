@@ -1,0 +1,113 @@
+<div class="flex-entre mb-16">
+  <div>
+    <h2 class="mt-0 mb-0"><%= moto.marca %> <%= moto.modelo %> — <%= moto.placa %></h2>
+    <p class="texto-suave texto-pequeno mt-0">Cliente: <a href="/clientes/<%= moto.cliente._id %>"><%= moto.cliente.nome %></a></p>
+  </div>
+  <a href="/motos/<%= moto._id %>/editar" class="botao botao-secundario">Editar</a>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: repeat(4, 1fr);">
+  <div class="card"><span class="texto-suave texto-pequeno">Ano</span><p class="negrito"><%= moto.ano || '-' %></p></div>
+  <div class="card"><span class="texto-suave texto-pequeno">Cor</span><p class="negrito"><%= moto.cor || '-' %></p></div>
+  <div class="card"><span class="texto-suave texto-pequeno">Chassi</span><p class="negrito"><%= moto.chassi || '-' %></p></div>
+  <div class="card"><span class="texto-suave texto-pequeno">Quilometragem</span><p class="negrito"><%= moto.quilometragem %> km</p></div>
+</div>
+
+<% if (moto.fotos && moto.fotos.length) { %>
+  <div class="painel"><div class="painel-corpo galeria-fotos">
+    <% moto.fotos.forEach(f => { %><img src="<%= f %>" alt="Foto"><% }) %>
+  </div></div>
+<% } %>
+
+<div class="painel">
+  <div class="painel-cabecalho">
+    <h2>Ordens de Serviço</h2>
+    <a href="/ordens-servico/novo?clienteId=<%= moto.cliente._id %>" class="texto-pequeno">+ Nova OS</a>
+  </div>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Nº</th><th>Status</th><th>Total</th><th>Data</th></tr></thead>
+      <tbody>
+        <% if (!ordensServico.length) { %>
+          <tr><td colspan="4" class="estado-vazio">Nenhuma Ordem de Serviço registrada.</td></tr>
+        <% } %>
+        <% ordensServico.forEach(os => { %>
+          <tr>
+            <td><a href="/ordens-servico/<%= os._id %>">#<%= os.numero %></a></td>
+            <td><span class="badge badge-azul"><%= os.status.replace('_',' ') %></span></td>
+            <td><%= os.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><%= new Date(os.createdAt).toLocaleDateString('pt-BR') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="painel">
+  <div class="painel-cabecalho"><h2>Registrar nova revisão</h2></div>
+  <div class="painel-corpo">
+    <form action="/revisoes" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="moto" value="<%= moto._id %>">
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="item">Item da revisão *</label>
+          <select id="item" name="item" required>
+            <option value="troca_oleo">Troca de óleo</option>
+            <option value="filtro">Filtro</option>
+            <option value="pastilhas">Pastilhas</option>
+            <option value="relacao">Relação</option>
+            <option value="velas">Velas</option>
+            <option value="pneus">Pneus</option>
+            <option value="freios">Freios</option>
+            <option value="suspensao">Suspensão</option>
+            <option value="correia">Correia</option>
+            <option value="corrente">Corrente</option>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="quilometragemRealizada">KM da realização *</label>
+          <input type="number" id="quilometragemRealizada" name="quilometragemRealizada" required value="<%= moto.quilometragem %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="intervaloKm">Intervalo (km) *</label>
+          <input type="number" id="intervaloKm" name="intervaloKm" required value="3000">
+        </div>
+      </div>
+      <div class="form-grupo">
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" name="observacoes"></textarea>
+      </div>
+      <button type="submit" class="botao botao-primario">Registrar revisão</button>
+    </form>
+  </div>
+</div>
+
+<div class="painel">
+  <div class="painel-cabecalho"><h2>Revisões</h2></div>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Item</th><th>Realizada em</th><th>KM</th><th>Próxima KM</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <% if (!revisoes.length) { %>
+          <tr><td colspan="6" class="estado-vazio">Nenhuma revisão registrada.</td></tr>
+        <% } %>
+        <% revisoes.forEach(r => { %>
+          <tr>
+            <td><%= r.item.replace('_',' ') %></td>
+            <td><%= new Date(r.dataRealizada).toLocaleDateString('pt-BR') %></td>
+            <td><%= r.quilometragemRealizada %> km</td>
+            <td><%= r.proximaQuilometragem %> km</td>
+            <td><span class="badge <%= r.concluida ? 'badge-verde' : 'badge-amarelo' %>"><%= r.concluida ? 'Concluída' : 'Pendente' %></span></td>
+            <td>
+              <% if (moto.cliente.whatsapp) { %>
+                <a href="<%= construirLinkWhatsApp(moto.cliente.whatsapp, montarMensagemProximaRevisao(moto.cliente, moto, r)) %>" target="_blank" class="botao botao-sucesso botao-pequeno">📲</a>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<div class="painel">
+  <div class="painel-corpo">
+    <form action="<%= modo === 'criar' ? '/motos' : `/motos/${moto._id}?_method=PUT` %>" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-grupo">
+        <label for="cliente">Cliente *</label>
+        <select id="cliente" name="cliente" required>
+          <option value="">Selecione o cliente</option>
+          <% clientes.forEach(c => { %>
+            <option value="<%= c._id %>" <%= (moto.cliente?._id || moto.cliente) == c._id ? 'selected' : '' %>><%= c.nome %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="marca">Marca *</label>
+          <input type="text" id="marca" name="marca" required value="<%= moto.marca || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="modelo">Modelo *</label>
+          <input type="text" id="modelo" name="modelo" required value="<%= moto.modelo || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="ano">Ano</label>
+          <input type="number" id="ano" name="ano" value="<%= moto.ano || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="cor">Cor</label>
+          <input type="text" id="cor" name="cor" value="<%= moto.cor || '' %>">
+        </div>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="placa">Placa *</label>
+          <input type="text" id="placa" name="placa" required value="<%= moto.placa || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="chassi">Chassi</label>
+          <input type="text" id="chassi" name="chassi" value="<%= moto.chassi || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="motor">Motor</label>
+          <input type="text" id="motor" name="motor" value="<%= moto.motor || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="quilometragem">Quilometragem</label>
+          <input type="number" id="quilometragem" name="quilometragem" value="<%= moto.quilometragem || 0 %>">
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" name="observacoes"><%= moto.observacoes || '' %></textarea>
+      </div>
+
+      <div class="form-grupo">
+        <label for="fotos">Fotos</label>
+        <input type="file" id="fotos" name="fotos" accept="image/*" multiple>
+      </div>
+
+      <% if (moto.fotos && moto.fotos.length) { %>
+        <div class="galeria-fotos mb-16">
+          <% moto.fotos.forEach(f => { %><img src="<%= f %>" alt="Foto da moto"><% }) %>
+        </div>
+      <% } %>
+
+      <div class="flex gap-12">
+        <button type="submit" class="botao botao-primario">Salvar</button>
+        <a href="/motos" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>

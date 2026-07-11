@@ -1,0 +1,116 @@
+<div class="grid-cards">
+  <div class="card card-indicador">
+    <div><div class="rotulo">Motos em manutenção</div><div class="valor"><%= indicadores.motosEmManutencao %></div></div>
+    <div class="icone-card bg-azul">🏍️</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Clientes</div><div class="valor"><%= indicadores.totalClientes %></div></div>
+    <div class="icone-card bg-roxo">👤</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Peças cadastradas</div><div class="valor"><%= indicadores.totalPecas %></div></div>
+    <div class="icone-card bg-ciano">📦</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Valor em caixa</div><div class="valor"><%= indicadores.valorEmCaixa.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+    <div class="icone-card bg-verde">💵</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Contas a pagar</div><div class="valor"><%= indicadores.contasAPagar.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+    <div class="icone-card bg-vermelho">📉</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Contas a receber</div><div class="valor"><%= indicadores.contasAReceber.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+    <div class="icone-card bg-laranja">📈</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Serviços em andamento</div><div class="valor"><%= indicadores.servicosEmAndamento %></div></div>
+    <div class="icone-card bg-azul">🔧</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Caixa</div><div class="valor" style="font-size:16px;">
+      <span class="badge <%= caixaAberto ? 'badge-verde' : 'badge-vermelho' %>"><%= caixaAberto ? 'Aberto' : 'Fechado' %></span>
+    </div></div>
+    <div class="icone-card bg-verde">🔓</div>
+  </div>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: 2fr 1fr;">
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Faturamento (últimos 7 dias)</h2></div>
+    <div class="painel-corpo">
+      <canvas id="graficoFaturamento" height="90"></canvas>
+    </div>
+  </div>
+
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Faturamento por período</h2></div>
+    <div class="painel-corpo">
+      <p class="flex-entre"><span class="texto-suave">Hoje</span> <span class="negrito"><%= indicadores.faturamentoDiario.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></span></p>
+      <p class="flex-entre"><span class="texto-suave">7 dias</span> <span class="negrito"><%= indicadores.faturamentoSemanal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></span></p>
+      <p class="flex-entre"><span class="texto-suave">Este mês</span> <span class="negrito"><%= indicadores.faturamentoMensal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></span></p>
+      <p class="flex-entre"><span class="texto-suave">Este ano</span> <span class="negrito"><%= indicadores.faturamentoAnual.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></span></p>
+    </div>
+  </div>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: 1fr 1fr;">
+  <div class="painel">
+    <div class="painel-cabecalho">
+      <h2>Estoque baixo</h2>
+      <a href="/estoque?apenasEstoqueBaixo=1" class="texto-pequeno">Ver tudo</a>
+    </div>
+    <div class="painel-corpo">
+      <% if (!estoqueBaixo.length) { %>
+        <p class="texto-suave texto-pequeno">Nenhuma peça com estoque baixo. 🎉</p>
+      <% } else { %>
+        <% estoqueBaixo.slice(0, 6).forEach(p => { %>
+          <p class="flex-entre" style="padding:6px 0; border-bottom:1px solid var(--cor-borda);">
+            <span><%= p.nome %></span>
+            <span class="badge badge-vermelho"><%= p.quantidade %> un.</span>
+          </p>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="painel">
+    <div class="painel-cabecalho">
+      <h2>Últimos serviços</h2>
+      <a href="/ordens-servico" class="texto-pequeno">Ver tudo</a>
+    </div>
+    <div class="painel-corpo">
+      <% if (!ultimasOs.length) { %>
+        <p class="texto-suave texto-pequeno">Nenhuma ordem de serviço registrada ainda.</p>
+      <% } else { %>
+        <% ultimasOs.forEach(os => { %>
+          <p class="flex-entre" style="padding:6px 0; border-bottom:1px solid var(--cor-borda);">
+            <a href="/ordens-servico/<%= os._id %>">OS Nº <%= os.numero %> - <%= os.cliente?.nome %></a>
+            <span class="badge badge-azul"><%= os.status.replace('_',' ') %></span>
+          </p>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+  const ctx = document.getElementById('graficoFaturamento');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: <%- JSON.stringify(graficoDias.map(d => d.label)) %>,
+      datasets: [{
+        label: 'Faturamento (R$)',
+        data: <%- JSON.stringify(graficoDias.map(d => d.valor)) %>,
+        backgroundColor: '#2563eb',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+</script>

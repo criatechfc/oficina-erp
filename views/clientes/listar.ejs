@@ -1,0 +1,49 @@
+<div class="flex-entre mb-16">
+  <div class="barra-filtros" style="flex:1;">
+    <form method="GET" action="/clientes">
+      <input type="search" name="busca" placeholder="Buscar por nome, CPF, telefone..." value="<%= busca %>">
+      <button type="submit" class="botao botao-secundario">Buscar</button>
+    </form>
+  </div>
+  <a href="/clientes/novo" class="botao botao-primario">+ Novo Cliente</a>
+</div>
+
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>Cidade</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% if (!clientes.length) { %>
+          <tr><td colspan="5" class="estado-vazio">Nenhum cliente encontrado.</td></tr>
+        <% } %>
+        <% clientes.forEach(c => { %>
+          <tr>
+            <td><a href="/clientes/<%= c._id %>"><%= c.nome %></a></td>
+            <td><%= c.cpf || '-' %></td>
+            <td><%= c.telefone || '-' %></td>
+            <td><%= c.cidade || '-' %></td>
+            <td>
+              <div class="flex gap-8">
+                <a href="/clientes/<%= c._id %>/editar" class="botao botao-secundario botao-pequeno">Editar</a>
+                <form action="/clientes/<%= c._id %>?_method=DELETE" method="POST" data-confirmar="Remover este cliente?">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="botao botao-perigo botao-pequeno">Excluir</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (totalPaginas > 1) { %>
+  <div class="paginacao">
+    <% for (let i = 1; i <= totalPaginas; i++) { %>
+      <a href="/clientes?busca=<%= busca %>&pagina=<%= i %>" class="<%= i === paginaAtual ? 'ativo' : '' %>"><%= i %></a>
+    <% } %>
+  </div>
+<% } %>

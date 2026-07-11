@@ -1,0 +1,55 @@
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <% if (configuracao?.logo) { %>
+      <img src="<%= configuracao.logo %>" alt="Logo">
+    <% } else { %>
+      <span>🏍️</span>
+    <% } %>
+    <span><%= configuracao?.nomeOficina || 'Oficina ERP' %></span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="/dashboard" class="<%= rotaAtual.startsWith('/dashboard') ? 'ativo' : '' %>"><span class="icone">📊</span> Dashboard</a>
+
+    <% if (podeAcessar(usuarioLogado.perfil, 'clientes')) { %>
+      <a href="/clientes" class="<%= rotaAtual.startsWith('/clientes') ? 'ativo' : '' %>"><span class="icone">👤</span> Clientes</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'motos')) { %>
+      <a href="/motos" class="<%= rotaAtual.startsWith('/motos') ? 'ativo' : '' %>"><span class="icone">🏍️</span> Motos</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'ordensServico')) { %>
+      <a href="/ordens-servico" class="<%= rotaAtual.startsWith('/ordens-servico') ? 'ativo' : '' %>"><span class="icone">🔧</span> Ordens de Serviço</a>
+      <a href="/revisoes" class="<%= rotaAtual.startsWith('/revisoes') ? 'ativo' : '' %>"><span class="icone">🛠️</span> Revisões</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'vendas')) { %>
+      <a href="/vendas" class="<%= rotaAtual.startsWith('/vendas') ? 'ativo' : '' %>"><span class="icone">🧾</span> Vendas</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'estoque')) { %>
+      <a href="/estoque" class="<%= rotaAtual.startsWith('/estoque') ? 'ativo' : '' %>"><span class="icone">📦</span> Estoque</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'fornecedores')) { %>
+      <a href="/fornecedores" class="<%= rotaAtual.startsWith('/fornecedores') ? 'ativo' : '' %>"><span class="icone">🏭</span> Fornecedores</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'caixa')) { %>
+      <a href="/caixa" class="<%= rotaAtual.startsWith('/caixa') ? 'ativo' : '' %>"><span class="icone">💵</span> Caixa</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'financeiro')) { %>
+      <a href="/financeiro" class="<%= rotaAtual.startsWith('/financeiro') ? 'ativo' : '' %>"><span class="icone">📈</span> Financeiro</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'relatorios')) { %>
+      <a href="/relatorios" class="<%= rotaAtual.startsWith('/relatorios') ? 'ativo' : '' %>"><span class="icone">📄</span> Relatórios</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'usuarios')) { %>
+      <a href="/usuarios" class="<%= rotaAtual.startsWith('/usuarios') ? 'ativo' : '' %>"><span class="icone">🔐</span> Usuários</a>
+    <% } %>
+    <% if (podeAcessar(usuarioLogado.perfil, 'configuracoes')) { %>
+      <a href="/configuracoes" class="<%= rotaAtual.startsWith('/configuracoes') ? 'ativo' : '' %>"><span class="icone">⚙️</span> Configurações</a>
+    <% } %>
+
+    <a href="/perfil" class="<%= rotaAtual.startsWith('/perfil') ? 'ativo' : '' %>"><span class="icone">🙍</span> Meu Perfil</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    Oficina ERP &copy; <%= new Date().getFullYear() %>
+  </div>
+</aside>

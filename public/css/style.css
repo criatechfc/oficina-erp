@@ -37,6 +37,8 @@ html, body {
   background: var(--cor-fundo);
   color: var(--cor-texto);
   font-size: 15px;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 a { color: var(--cor-primaria); text-decoration: none; }
@@ -275,4 +277,39 @@ tbody tr:last-child td { border-bottom: none; }
   .conteudo { margin-left: 0; }
   .menu-toggle { display: flex; }
   .item-dinamico { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  /* Qualquer grid de cards com colunas fixas (ex: "2fr 1fr", "repeat(4,1fr)")
+     definidas via style inline nas páginas vira 1 única coluna aqui. */
+  .grid-cards { grid-template-columns: 1fr !important; }
+
+  .pagina { padding: 14px; }
+
+  .topbar { padding: 12px 14px; }
+  .topbar h1 { font-size: 16px; }
+
+  /* Esconde nome/perfil do usuário na topbar, mantém só o avatar */
+  .usuario-chip .nome, .usuario-chip .perfil { display: none; }
+  .usuario-chip { gap: 0; }
+
+  .topbar-acoes { gap: 8px; }
+
+  .card-indicador .valor { font-size: 21px; }
+
+  .barra-filtros { flex-direction: column; align-items: stretch; }
+  .barra-filtros form { flex-direction: column; }
+  .barra-filtros input, .barra-filtros select { max-width: 100%; }
+
+  .form-linha { grid-template-columns: 1fr; }
+
+  table { font-size: 12.5px; }
+  thead th, tbody td { padding: 9px 8px; }
+
+  .painel-corpo { padding: 14px; }
+  .painel-cabecalho { padding: 12px 14px; flex-wrap: wrap; gap: 8px; }
+
+  .caixa-login { padding: 26px 20px; }
+
+  .flex-entre { flex-wrap: wrap; gap: 10px; }
 }

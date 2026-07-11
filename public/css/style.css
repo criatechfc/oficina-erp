@@ -84,6 +84,29 @@ a:hover { text-decoration: underline; }
   font-weight: 500;
   border-left: 3px solid transparent;
 }
+
+.footer {
+    width: 100%;
+    padding: 18px 20px;
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+    margin-top: 30px;
+}
+
+.footer a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.footer a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
 .sidebar-nav a:hover { background: rgba(255,255,255,0.06); text-decoration: none; color: #fff; }
 .sidebar-nav a.ativo { background: rgba(37,99,235,0.15); border-left-color: var(--cor-sidebar-ativo); color: #fff; }
 .sidebar-nav .icone { width: 18px; text-align: center; opacity: .9; }

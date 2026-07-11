@@ -8,7 +8,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const mongoSanitize = require('express-mongo-sanitize');
 const methodOverride = require('method-override');
-const csurf = require('csurf');
+
 const expressLayouts = require('express-ejs-layouts');
 
 const config = require('./config/config');
@@ -86,12 +86,19 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // CSRF é aplicado depois dos arquivos estáticos e antes das rotas de formulário
-const csrfProtection = csurf({ cookie: false });
+const { csrfProtection } = require('./middlewares/csrf');
 app.use((req, res, next) => {
-  // Rotas de API/webhook externas (nenhuma atualmente) poderiam ser isentas aqui.
+  // Requisições multipart/form-data (formulários com upload de foto: motos,
+  // estoque, perfil, configurações) ainda não tiveram o body processado pelo
+  // multer neste ponto, então o campo _csrf não está disponível ainda.
+  // Para essas rotas, o csrfProtection é aplicado depois do multer, na
+  // própria definição da rota (ver motoRoutes, estoqueRoutes, perfilRoutes,
+  // configRoutes). Para todas as outras (JSON/urlencoded), valida aqui.
+  if (req.is('multipart/form-data')) {
+    return next();
+  }
   return csrfProtection(req, res, next);
 });
-
 app.use(injetarLocals);
 
 // Disponibiliza helper de permissões nas views

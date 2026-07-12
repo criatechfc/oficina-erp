@@ -57,7 +57,7 @@
             <label for="status">Alterar status</label>
             <select id="status" name="status">
               <% statusLista.forEach(s => { %>
-                <option value="<%= s %>" <%= os.status === s ? 'selected' : '' %>><%= s.replace('_',' ') %></option>
+                <option value="<%= s %>" <%= os.status === s ? 'selected' : '' %>><%= rotuloStatusOS(s) %></option>
               <% }) %>
             </select>
           </div>
@@ -76,7 +76,7 @@
         <ul class="timeline">
           <% os.historicoStatus.slice().reverse().forEach(h => { %>
             <li>
-              <strong><%= h.status.replace('_',' ') %></strong>
+              <strong><%= rotuloStatusOS(h.status) %></strong>
               <p class="texto-suave texto-pequeno mb-0"><%= new Date(h.data).toLocaleString('pt-BR') %> — <%= h.usuario?.nome || '-' %></p>
               <% if (h.observacao) { %><p class="texto-pequeno mb-0"><%= h.observacao %></p><% } %>
             </li>

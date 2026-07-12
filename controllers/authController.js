@@ -116,15 +116,21 @@ async function solicitarRecuperacao(req, res) {
       const token = usuario.gerarTokenReset();
       await usuario.save();
       const linkReset = `${config.appUrl}/redefinir-senha/${token}`;
-      try {
-        const enviado = await enviarEmailRecuperacaoSenha(usuario.email, usuario.nome, linkReset);
-        if (!enviado) {
-          // SMTP não configurado: registra no console como alternativa para não travar o fluxo.
-          console.log(`[Recuperação de senha] SMTP não configurado. Link para ${usuario.email}: ${linkReset}`);
-        }
-      } catch (err) {
-        console.error('[Recuperação de senha] Falha ao enviar e-mail:', err.message);
-      }
+
+      // Não usar await aqui: o envio de e-mail depende de um servidor SMTP
+      // externo que pode estar lento, indisponível, ou ter a porta bloqueada
+      // pelo provedor de hospedagem. Se a resposta HTTP esperasse por isso,
+      // a tela ficava "carregando" até o SMTP travar/der timeout. O envio
+      // roda em segundo plano e qualquer erro só vai para o log.
+      enviarEmailRecuperacaoSenha(usuario.email, usuario.nome, linkReset)
+        .then((enviado) => {
+          if (!enviado) {
+            console.log(`[Recuperação de senha] SMTP não configurado. Link para ${usuario.email}: ${linkReset}`);
+          }
+        })
+        .catch((err) => {
+          console.error('[Recuperação de senha] Falha ao enviar e-mail:', err.message);
+        });
     }
   }
 
@@ -132,7 +138,6 @@ async function solicitarRecuperacao(req, res) {
   req.session.mensagemSucesso = 'Se o e-mail existir em nossa base, um link de recuperação foi enviado.';
   return res.redirect('/login');
 }
-
 async function paginaRedefinirSenha(req, res) {
   const { token } = req.params;
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');

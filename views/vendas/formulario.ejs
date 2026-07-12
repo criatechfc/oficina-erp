@@ -57,7 +57,7 @@
     <select name="itemPecaId" onchange="preencherDescricaoEPreco(this)">
       <option value="">Selecione a peça</option>
       <% pecas.forEach(p => { %>
-        <option value="<%= p._id %>" data-nome="<%= p.nome %>" data-preco="<%= p.precoVenda %>">(estoque: <%= p.quantidade %>)</option>
+      <option value="<%= p._id %>" data-nome="<%= p.nome %>" data-preco="<%= p.precoVenda %>"><%= p.nome %> (estoque: <%= p.quantidade %>)</option>
       <% }) %>
     </select>
     <input type="hidden" name="itemDescricao" class="campo-descricao">

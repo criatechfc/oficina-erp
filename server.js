@@ -18,6 +18,8 @@ const { exigirAutenticacao } = require('./middlewares/auth');
 const { injetarLocals } = require('./middlewares/viewLocals');
 const { paginaNaoEncontrada, tratadorErros } = require('./middlewares/errorHandler');
 const { podeAcessar } = require('./utils/permissoes');
+const { rotuloStatusOS, rotuloStatusVenda, rotuloStatusRevisao, rotuloItemRevisao } = require('./utils/statusLabels');
+const { formatarCpf, formatarCnpj } = require('./utils/validacao');
 
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');

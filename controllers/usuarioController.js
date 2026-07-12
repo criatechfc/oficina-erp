@@ -19,8 +19,12 @@ async function criar(req, res, next) {
   try {
     const { nome, email, senha, perfil, telefone } = req.body;
 
-    if (!ehEmailValido(email) || !ehSenhaForte(senha)) {
-      req.session.mensagemErro = 'E-mail inválido ou senha fraca (mín. 8 caracteres, maiúscula, minúscula e número).';
+ if (!ehEmailValido(email)) {
+      req.session.mensagemErro = 'E-mail inválido.';
+      return res.redirect('/usuarios/novo');
+    }
+    if (!ehSenhaForte(senha)) {
+      req.session.mensagemErro = 'Senha fraca (mín. 8 caracteres, com maiúscula, minúscula e número).';
       return res.redirect('/usuarios/novo');
     }
 

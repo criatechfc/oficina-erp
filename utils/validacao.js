@@ -35,4 +35,18 @@ function ehSenhaForte(senha) {
   });
 }
 
-module.exports = { limparString, ehEmailValido, ehCpfValido, ehSenhaForte };
+function formatarCpf(cpf) {
+  if (!cpf) return '';
+  const limpo = String(cpf).replace(/\D/g, '');
+  if (limpo.length !== 11) return cpf;
+  return limpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+function formatarCnpj(cnpj) {
+  if (!cnpj) return '';
+  const limpo = String(cnpj).replace(/\D/g, '');
+  if (limpo.length !== 14) return cnpj;
+  return limpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+}
+
+module.exports = { limparString, ehEmailValido, ehCpfValido, ehSenhaForte, formatarCpf, formatarCnpj };

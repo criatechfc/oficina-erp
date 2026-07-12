@@ -21,7 +21,7 @@
         <% clientes.forEach(c => { %>
           <tr>
             <td><a href="/clientes/<%= c._id %>"><%= c.nome %></a></td>
-            <td><%= c.cpf || '-' %></td>
+            <td><%= formatarCpf(c.cpf) || '-' %></td>
             <td><%= c.telefone || '-' %></td>
             <td><%= c.cidade || '-' %></td>
             <td>

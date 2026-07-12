@@ -86,7 +86,7 @@
         <% ultimasOs.forEach(os => { %>
           <p class="flex-entre" style="padding:6px 0; border-bottom:1px solid var(--cor-borda);">
             <a href="/ordens-servico/<%= os._id %>">OS Nº <%= os.numero %> - <%= os.cliente?.nome %></a>
-            <span class="badge badge-azul"><%= os.status.replace('_',' ') %></span>
+           <span class="badge badge-azul"><%= rotuloStatusOS(os.status) %></span>
           </p>
         <% }) %>
       <% } %>

@@ -95,7 +95,7 @@
         <% } %>
         <% revisoes.forEach(r => { %>
           <tr>
-            <td><%= r.item.replace('_',' ') %></td>
+            <td><%= rotuloItemRevisao(r.item) %></td>
             <td><%= new Date(r.dataRealizada).toLocaleDateString('pt-BR') %></td>
             <td><%= r.quilometragemRealizada %> km</td>
             <td><%= r.proximaQuilometragem %> km</td>

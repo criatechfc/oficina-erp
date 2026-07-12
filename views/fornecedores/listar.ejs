@@ -21,7 +21,7 @@
             <td><%= f.empresa %></td>
             <td><%= f.contato || '-' %></td>
             <td><%= f.telefone || '-' %></td>
-            <td><%= f.cnpj || '-' %></td>
+            <td><%= formatarCnpj(f.cnpj) || '-' %></td>
             <td>
               <div class="flex gap-8">
                 <a href="/fornecedores/<%= f._id %>/editar" class="botao botao-secundario botao-pequeno">Editar</a>

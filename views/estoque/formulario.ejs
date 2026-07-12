@@ -32,7 +32,7 @@
           <select id="fornecedor" name="fornecedor">
             <option value="">Selecione</option>
             <% fornecedores.forEach(f => { %>
-              <option value="<%= f._id %>" <%= (peca.fornecedor?._id || peca.fornecedor) == f._id ? 'selected' : '' %>><%= f.empresa %></option>
+              <option value="<%= f._id %>" <%= String(peca.fornecedor?._id || peca.fornecedor || '') === String(f._id) ? 'selected' : '' %>><%= f.empresa %></option>
             <% }) %>
           </select>
         </div>

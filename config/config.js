@@ -16,12 +16,9 @@ module.exports = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
   sessionSecret: required('SESSION_SECRET'),
   appUrl: process.env.APP_URL || 'http://localhost:3000',
-  smtp: {
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT, 10) || 587,
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-    from: process.env.SMTP_FROM || 'Oficina ERP <no-reply@oficina.com>'
+resend: {
+    apiKey: process.env.RESEND_API_KEY,
+    from: process.env.RESEND_FROM || 'Oficina ERP <onboarding@resend.dev>'
   },
   whatsapp: {
     apiUrl: process.env.WHATSAPP_API_URL || '',

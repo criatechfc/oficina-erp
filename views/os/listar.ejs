@@ -5,7 +5,7 @@
       <select name="status">
         <option value="">Todos os status</option>
         <% statusLista.forEach(s => { %>
-          <option value="<%= s %>" <%= status === s ? 'selected' : '' %>><%= s.replace('_',' ') %></option>
+         <option value="<%= s %>" <%= status === s ? 'selected' : '' %>><%= rotuloStatusOS(s) %></option>
         <% }) %>
       </select>
       <button type="submit" class="botao botao-secundario">Filtrar</button>
@@ -29,7 +29,7 @@
             <td><%= os.cliente?.nome || '-' %></td>
             <td><%= os.moto?.marca %> <%= os.moto?.modelo %> (<%= os.moto?.placa %>)</td>
             <td><%= os.mecanico?.nome || '-' %></td>
-            <td><span class="badge <%= mapaBadge[os.status] %>"><%= os.status.replace('_',' ') %></span></td>
+           <td><span class="badge <%= mapaBadge[os.status] %>"><%= rotuloStatusOS(os.status) %></span></td>
             <td><%= os.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
             <td><%= new Date(os.createdAt).toLocaleDateString('pt-BR') %></td>
           </tr>

@@ -120,9 +120,14 @@ app.use(injetarLocals);
 // Disponibiliza helper de permissões nas views
 app.use((req, res, next) => {
   res.locals.podeAcessar = podeAcessar;
+  res.locals.rotuloStatusOS = rotuloStatusOS;
+  res.locals.rotuloStatusVenda = rotuloStatusVenda;
+  res.locals.rotuloStatusRevisao = rotuloStatusRevisao;
+  res.locals.rotuloItemRevisao = rotuloItemRevisao;
+  res.locals.formatarCpf = formatarCpf;
+  res.locals.formatarCnpj = formatarCnpj;
   next();
 });
-
 // Rotas públicas
 app.use('/', authRoutes);
 

@@ -11,7 +11,7 @@
           <tr>
             <td><%= r.moto?.cliente?.nome || '-' %></td>
             <td><%= r.moto?.marca %> <%= r.moto?.modelo %> (<%= r.moto?.placa %>)</td>
-            <td><%= r.item.replace('_',' ') %></td>
+            <td><%= rotuloItemRevisao(r.item) %></td>
             <td><%= r.proximaQuilometragem %> km</td>
             <td><%= r.proximaData ? new Date(r.proximaData).toLocaleDateString('pt-BR') : '-' %></td>
             <td>

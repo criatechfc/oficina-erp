@@ -8,7 +8,7 @@
         <select id="cliente" name="cliente" required>
           <option value="">Selecione o cliente</option>
           <% clientes.forEach(c => { %>
-            <option value="<%= c._id %>" <%= (moto.cliente?._id || moto.cliente) == c._id ? 'selected' : '' %>><%= c.nome %></option>
+            <option value="<%= c._id %>" <%= String(moto.cliente?._id || moto.cliente || '') === String(c._id) ? 'selected' : '' %>><%= c.nome %></option>
           <% }) %>
         </select>
       </div>

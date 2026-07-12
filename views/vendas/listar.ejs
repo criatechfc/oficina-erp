@@ -28,7 +28,7 @@
             <td><%= v.cliente?.nome || 'Consumidor final' %></td>
             <td><%= v.vendedor?.nome || '-' %></td>
             <td><%= v.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
-            <td><span class="badge <%= mapaStatusVenda[v.status] %>"><%= v.status.replace('_',' ') %></span></td>
+            <td><span class="badge <%= mapaStatusVenda[v.status] %>"><%= rotuloStatusVenda(v.status) %></span></td>
             <td><%= new Date(v.createdAt).toLocaleDateString('pt-BR') %></td>
           </tr>
         <% }) %>

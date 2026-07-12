@@ -52,6 +52,7 @@ async function criar(req, res, next) {
 
     const peca = await Peca.create({
       ...dados,
+      fornecedor: dados.fornecedor || undefined,
       quantidade: parseInt(dados.quantidade, 10) || 0,
       estoqueMinimo: parseInt(dados.estoqueMinimo, 10) || 0,
       precoCusto: parseFloat(dados.precoCusto) || 0,
@@ -115,9 +116,10 @@ async function atualizar(req, res, next) {
       peca.fotos = [...peca.fotos, ...novasFotos];
     }
 
-    ['codigo', 'codigoBarras', 'nome', 'categoria', 'fornecedor', 'marca', 'descricao', 'localizacao'].forEach((campo) => {
+    ['codigo', 'codigoBarras', 'nome', 'categoria', 'marca', 'descricao', 'localizacao'].forEach((campo) => {
       if (dados[campo] !== undefined) peca[campo] = dados[campo];
     });
+    if (dados.fornecedor !== undefined) peca.fornecedor = dados.fornecedor || null;
     peca.estoqueMinimo = parseInt(dados.estoqueMinimo, 10) || 0;
     peca.precoCusto = parseFloat(dados.precoCusto) || 0;
     peca.precoVenda = parseFloat(dados.precoVenda) || 0;

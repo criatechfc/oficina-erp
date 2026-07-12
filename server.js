@@ -51,6 +51,13 @@ app.use(
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com'],
         scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com'],
+        // O Helmet mantém "script-src-attr" separado de "script-src" e o
+        // padrão dele é 'none', o que bloqueia silenciosamente todo atributo
+        // inline (onclick, onchange) usado nas telas de OS, Vendas e
+        // Financeiro. Sem isso liberado, esses cliques/seleções não fazem
+        // nada e não aparece nenhum erro no console de rede — só um aviso
+        // de CSP, fácil de passar despercebido.
+        scriptSrcAttr: ["'unsafe-inline'"],
         imgSrc: ["'self'", 'data:', 'blob:'],
         fontSrc: ["'self'", 'https://cdnjs.cloudflare.com']
       }

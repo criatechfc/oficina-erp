@@ -57,13 +57,20 @@ app.use(
         // Financeiro. Sem isso liberado, esses cliques/seleções não fazem
         // nada e não aparece nenhum erro no console de rede — só um aviso
         // de CSP, fácil de passar despercebido.
-        scriptSrcAttr: ["'unsafe-inline'"],
+scriptSrcAttr: ["'unsafe-inline'"],
         imgSrc: ["'self'", 'data:', 'blob:'],
         fontSrc: ["'self'", 'https://cdnjs.cloudflare.com']
       }
     }
   })
 );
+
+// Helmet 7 não define Permissions-Policy por padrão. O sistema não usa
+// câmera, microfone ou geolocalização, então bloqueamos explicitamente.
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
 
 app.use(compression());
 app.use(morgan(config.isProduction ? 'combined' : 'dev'));

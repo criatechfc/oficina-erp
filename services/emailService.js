@@ -21,7 +21,12 @@ function obterTransportador() {
       auth: {
         user: config.smtp.user,
         pass: config.smtp.pass
-      }
+      },
+      // Evita que o envio fique pendurado indefinidamente caso a porta SMTP
+      // esteja bloqueada pelo provedor de hospedagem ou o servidor não responda.
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000
     });
   }
   return transportador;

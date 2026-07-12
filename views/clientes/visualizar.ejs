@@ -7,7 +7,7 @@
 </div>
 
 <div class="grid-cards" style="grid-template-columns: 1fr 1fr 1fr;">
-  <div class="card"><span class="texto-suave texto-pequeno">CPF</span><p class="negrito"><%= cliente.cpf || '-' %></p></div>
+  <div class="card"><span class="texto-suave texto-pequeno">CPF</span><p class="negrito"><%= formatarCpf(cliente.cpf) || '-' %></p></div>
   <div class="card"><span class="texto-suave texto-pequeno">Endereço</span><p class="negrito"><%= cliente.endereco || '-' %>, <%= cliente.cidade || '' %>/<%= cliente.estado || '' %></p></div>
   <div class="card"><span class="texto-suave texto-pequeno">WhatsApp</span><p class="negrito"><%= cliente.whatsapp || '-' %></p></div>
 </div>

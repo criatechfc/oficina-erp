@@ -1,0 +1,65 @@
+<div class="flex-entre mb-16">
+  <div class="barra-filtros" style="flex:1;">
+    <form method="GET" action="/estoque">
+      <input type="search" id="busca-estoque" name="busca" placeholder="Buscar por nome, código ou código de barras..." value="<%= busca %>">
+      <button type="button" id="busca-estoque-camera" class="botao botao-secundario" title="Buscar escaneando com a câmera">📷</button>
+      <select name="apenasEstoqueBaixo">
+        <option value="">Todos</option>
+        <option value="1" <%= apenasEstoqueBaixo === '1' ? 'selected' : '' %>>Apenas estoque baixo</option>
+      </select>
+      <button type="submit" class="botao botao-secundario">Filtrar</button>
+    </form>
+  </div>
+  <a href="/estoque/novo" class="botao botao-primario">+ Nova Peça</a>
+</div>
+
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Código</th><th>Nome</th><th>Categoria</th><th>Qtd</th><th>Preço Venda</th><th></th></tr></thead>
+      <tbody>
+        <% if (!pecas.length) { %>
+          <tr><td colspan="6" class="estado-vazio">Nenhuma peça encontrada.</td></tr>
+        <% } %>
+        <% pecas.forEach(p => { %>
+          <tr>
+            <td><%= p.codigo %></td>
+            <td><%= p.nome %></td>
+            <td><%= p.categoria || '-' %></td>
+            <td>
+              <span class="badge <%= p.quantidade <= p.estoqueMinimo ? 'badge-vermelho' : 'badge-verde' %>"><%= p.quantidade %></span>
+            </td>
+            <td><%= p.precoVenda.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td>
+              <div class="flex gap-8">
+                <a href="/estoque/<%= p._id %>/historico" class="botao botao-secundario botao-pequeno">Histórico</a>
+                <a href="/estoque/<%= p._id %>/editar" class="botao botao-secundario botao-pequeno">Editar</a>
+                <form action="/estoque/<%= p._id %>?_method=DELETE" method="POST" data-confirmar="Remover esta peça?">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="botao botao-perigo botao-pequeno">Excluir</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if (totalPaginas > 1) { %>
+  <div class="paginacao">
+    <% for (let i = 1; i <= totalPaginas; i++) { %>
+      <a href="/estoque?busca=<%= busca %>&pagina=<%= i %>" class="<%= i === paginaAtual ? 'ativo' : '' %>"><%= i %></a>
+    <% } %>
+  </div>
+<% } %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    ativarBotaoCameraParaCampo('busca-estoque-camera', 'busca-estoque', (codigo, input) => {
+      input.closest('form').submit();
+    });
+  });
+</script>

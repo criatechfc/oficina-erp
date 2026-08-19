@@ -1,0 +1,68 @@
+<div class="painel">
+  <div class="painel-corpo">
+    <form action="/financeiro" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-grupo">
+        <label for="tipo">Tipo *</label>
+        <select id="tipo" name="tipo" required>
+          <option value="pagar" <%= conta.tipo === 'pagar' ? 'selected' : '' %>>Conta a Pagar</option>
+          <option value="receber" <%= conta.tipo === 'receber' ? 'selected' : '' %>>Conta a Receber</option>
+        </select>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="descricao">Descrição *</label>
+          <input type="text" id="descricao" name="descricao" required>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="categoria">Categoria *</label>
+          <input type="text" id="categoria" name="categoria" required placeholder="Ex.: Aluguel, Fornecedor, Serviço...">
+        </div>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="valor">Valor total (R$) *</label>
+          <input type="number" step="0.01" id="valor" name="valor" required>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="vencimento">1º vencimento *</label>
+          <input type="date" id="vencimento" name="vencimento" required>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="totalParcelas">Número de parcelas</label>
+          <input type="number" id="totalParcelas" name="totalParcelas" min="1" value="1">
+        </div>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="fornecedor">Fornecedor (se aplicável)</label>
+          <select id="fornecedor" name="fornecedor">
+            <option value="">Nenhum</option>
+            <% fornecedores.forEach(f => { %><option value="<%= f._id %>"><%= f.empresa %></option><% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="cliente">Cliente (se aplicável)</label>
+          <select id="cliente" name="cliente">
+            <option value="">Nenhum</option>
+            <% clientes.forEach(c => { %><option value="<%= c._id %>"><%= c.nome %></option><% }) %>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" name="observacoes"></textarea>
+      </div>
+
+      <div class="flex gap-12">
+        <button type="submit" class="botao botao-primario">Salvar</button>
+        <a href="/financeiro" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>

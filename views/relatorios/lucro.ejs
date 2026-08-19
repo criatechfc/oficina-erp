@@ -1,0 +1,16 @@
+<h2 class="mt-0 mb-16">Relatório de Lucro</h2>
+<div class="grid-cards" style="grid-template-columns: repeat(3, 1fr);">
+  <div class="card card-indicador">
+    <div><div class="rotulo">Receita total</div><div class="valor"><%= receitaTotal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+    <div class="icone-card bg-verde">📈</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Custo total (peças)</div><div class="valor"><%= custoTotal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+    <div class="icone-card bg-vermelho">📉</div>
+  </div>
+  <div class="card card-indicador">
+    <div><div class="rotulo">Lucro bruto</div><div class="valor"><%= lucroBruto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+    <div class="icone-card bg-azul">💰</div>
+  </div>
+</div>
+<p class="texto-suave texto-pequeno">* Lucro bruto considera receita das Ordens de Serviço finalizadas/entregues menos o custo das peças utilizadas. Não inclui despesas operacionais gerais (utilize o módulo Financeiro para essas despesas).</p>

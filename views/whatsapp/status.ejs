@@ -1,0 +1,82 @@
+<div class="painel">
+  <div class="painel-cabecalho"><h2>WhatsApp da oficina</h2></div>
+  <div class="painel-corpo">
+    <div class="alerta alerta-erro mb-16">
+      ⚠️ <strong>Isso NÃO é o WhatsApp Business oficial.</strong> É uma conexão feita por engenharia reversa
+      do WhatsApp Web — o WhatsApp/Meta pode banir esse número a qualquer momento, sem aviso e sem direito
+      a recurso. <strong>Não use o número pessoal do dono.</strong> Use um número dedicado só pra isso, que a
+      oficina possa perder sem drama.
+    </div>
+
+    <div id="whatsapp-area">
+      <p class="texto-suave">Carregando status...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const areaStatus = document.getElementById('whatsapp-area');
+  let jaConectando = false;
+
+  function renderizarStatus(dados) {
+    if (dados.status === 'conectado') {
+      areaStatus.innerHTML = `
+        <p class="mb-16"><span class="badge badge-verde">✅ Conectado</span> ${dados.numero ? `— número: ${dados.numero}` : ''}</p>
+        <form action="/whatsapp/desconectar" method="POST" data-confirmar="Desconectar o WhatsApp desta oficina? Os envios automáticos param até reconectar.">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="botao botao-perigo">Desconectar</button>
+        </form>
+      `;
+      document.querySelectorAll('[data-confirmar]').forEach((form) => {
+        form.addEventListener('submit', (e) => {
+          if (!confirm(form.getAttribute('data-confirmar'))) e.preventDefault();
+        });
+      });
+      return;
+    }
+
+    if (dados.status === 'aguardando_qr' && dados.qrDataUrl) {
+      areaStatus.innerHTML = `
+        <p class="mb-16"><span class="badge badge-azul">⏳ Aguardando leitura do QR code</span></p>
+        <p class="texto-suave texto-pequeno mb-16">No celular com o número que vai usar: WhatsApp &gt; Configurações &gt; Aparelhos conectados &gt; Conectar um aparelho.</p>
+        <img src="${dados.qrDataUrl}" alt="QR code do WhatsApp" style="max-width:260px; display:block; margin-bottom:16px;">
+        <p class="texto-suave texto-pequeno">O código expira em pouco tempo e é renovado automaticamente — não precisa recarregar a página.</p>
+      `;
+      return;
+    }
+
+    areaStatus.innerHTML = `
+      <p class="mb-16"><span class="badge badge-vermelho">Desconectado</span></p>
+      <button type="button" id="botao-conectar-whatsapp" class="botao botao-primario">Conectar WhatsApp</button>
+    `;
+    document.getElementById('botao-conectar-whatsapp')?.addEventListener('click', iniciarConexao);
+  }
+
+  async function iniciarConexao() {
+    if (jaConectando) return;
+    jaConectando = true;
+    areaStatus.innerHTML = '<p class="texto-suave">Iniciando conexão...</p>';
+    try {
+      await fetch('/whatsapp/conectar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'CSRF-Token': '<%= csrfToken %>' },
+        body: JSON.stringify({ _csrf: '<%= csrfToken %>' })
+      });
+    } catch (err) {
+      // segue mesmo assim — o polling abaixo vai refletir o estado real
+    }
+  }
+
+  async function atualizarStatus() {
+    try {
+      const resposta = await fetch('/whatsapp/status.json');
+      const dados = await resposta.json();
+      renderizarStatus(dados);
+    } catch (err) {
+      areaStatus.innerHTML = '<p class="texto-erro">Erro ao consultar status. Tentando de novo...</p>';
+    }
+  }
+
+  atualizarStatus();
+  setInterval(atualizarStatus, 3000);
+</script>

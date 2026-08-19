@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= titulo %> · <%= configuracao?.nomeOficina || 'Oficina' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="portal-publico">
+    <header class="portal-cabecalho">
+      <% if (configuracao?.logo) { %><img src="<%= configuracao.logo %>" alt="Logo" class="portal-logo"><% } %>
+      <h1><%= configuracao?.nomeOficina || 'Oficina' %></h1>
+      <p class="texto-suave mb-0">Ordem de Serviço Nº <%= os.numero %></p>
+    </header>
+
+    <% if (mensagemSucesso) { %><div class="alerta alerta-sucesso"><%= mensagemSucesso %></div><% } %>
+
+    <div class="painel">
+      <div class="painel-corpo">
+        <div class="flex-entre mb-16">
+          <div>
+            <p class="texto-suave texto-pequeno mb-0">Veículo</p>
+            <p class="negrito mb-0"><%= os.moto.marca %> <%= os.moto.modelo %> — <%= os.moto.placa %></p>
+          </div>
+          <span class="badge badge-azul"><%= rotuloStatusOS(os.status) %></span>
+        </div>
+
+        <p><strong>Problema informado:</strong><br><%= os.problemaInformado %></p>
+        <% if (os.diagnostico) { %><p><strong>Diagnóstico:</strong><br><%= os.diagnostico %></p><% } %>
+        <% if (os.mecanico) { %><p class="texto-suave texto-pequeno">Mecânico responsável: <%= os.mecanico.nome %></p><% } %>
+      </div>
+    </div>
+
+    <% if (os.status === 'aguardando_aprovacao' && os.aprovacaoStatus === 'pendente') { %>
+      <div class="painel">
+        <div class="painel-cabecalho"><h2>Orçamento para aprovação</h2></div>
+        <div class="painel-corpo">
+          <table class="mb-16">
+            <% os.pecasUtilizadas.forEach(p => { %>
+              <tr><td><%= p.quantidade %>x <%= p.nome %></td><td class="texto-centro"><%= (p.quantidade * p.precoUnitario).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td></tr>
+            <% }) %>
+            <% os.servicosRealizados.forEach(s => { %>
+              <tr><td><%= s.descricao %></td><td class="texto-centro"><%= s.valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td></tr>
+            <% }) %>
+          </table>
+          <% if (os.desconto > 0) { %><p class="texto-suave">Desconto: -<%= os.desconto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p><% } %>
+          <p style="font-size:22px;" class="negrito">Total: <%= os.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+
+          <div class="flex gap-12 mb-16">
+            <form action="/acompanhar/<%= os.tokenPublico %>/aprovar" method="POST" style="flex:1;" data-confirmar="Confirma a aprovação deste orçamento?">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="botao botao-sucesso botao-bloco">✅ Aprovar orçamento</button>
+            </form>
+            <button type="button" id="botao-abrir-recusa" class="botao botao-perigo" style="flex:1;">❌ Recusar</button>
+          </div>
+
+          <form id="form-recusa" action="/acompanhar/<%= os.tokenPublico %>/recusar" method="POST" style="display:none;">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="form-grupo">
+              <label for="motivo">Conte pra gente o motivo (opcional)</label>
+              <textarea id="motivo" name="motivo" placeholder="Ex.: valor acima do esperado, vou levar em outro lugar, quero pensar..."></textarea>
+            </div>
+            <button type="submit" class="botao botao-perigo botao-bloco">Confirmar recusa</button>
+          </form>
+        </div>
+      </div>
+    <% } %>
+
+    <% if (os.aprovacaoStatus === 'aprovado') { %>
+      <div class="alerta alerta-sucesso">✅ Orçamento aprovado em <%= new Date(os.aprovacaoData).toLocaleString('pt-BR') %>.</div>
+    <% } else if (os.aprovacaoStatus === 'recusado') { %>
+      <div class="alerta alerta-erro">
+        ❌ Orçamento recusado em <%= new Date(os.aprovacaoData).toLocaleString('pt-BR') %>.
+        <% if (os.aprovacaoObservacao) { %><br>Motivo: <%= os.aprovacaoObservacao %><% } %>
+        <br>Entre em contato com a oficina se quiser revisar.
+      </div>
+    <% } %>
+
+    <div class="painel">
+      <div class="painel-cabecalho"><h2>Andamento</h2></div>
+      <div class="painel-corpo">
+        <ul class="timeline">
+          <% os.historicoStatus.slice().reverse().forEach(h => { %>
+            <li>
+              <strong><%= rotuloStatusOS(h.status) %></strong>
+              <p class="texto-suave texto-pequeno mb-0"><%= new Date(h.data).toLocaleString('pt-BR') %></p>
+              <% /* Observação só aparece pro cliente quando NÃO foi um funcionário
+                    quem escreveu (h.usuario vazio = evento gerado pelo próprio
+                    sistema, como a aprovação/recusa feita pelo próprio cliente).
+                    Anotações internas do mecânico/atendente (h.usuario preenchido)
+                    nunca aparecem aqui — eram para uso interno da oficina, não
+                    para o cliente ver. */ %>
+              <% if (h.observacao && !h.usuario) { %><p class="texto-pequeno mb-0"><%= h.observacao %></p><% } %>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+
+    <footer class="footer texto-centro">
+      Desenvolvido pela <a href="https://criatech.online" target="_blank" rel="noopener noreferrer">Cria Tech</a>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const botaoAbrirRecusa = document.getElementById('botao-abrir-recusa');
+      const formRecusa = document.getElementById('form-recusa');
+      if (botaoAbrirRecusa && formRecusa) {
+        botaoAbrirRecusa.addEventListener('click', () => {
+          formRecusa.style.display = formRecusa.style.display === 'none' ? 'block' : 'none';
+        });
+      }
+
+      document.querySelectorAll('[data-confirmar]').forEach((form) => {
+        form.addEventListener('submit', (e) => {
+          if (!confirm(form.getAttribute('data-confirmar'))) e.preventDefault();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

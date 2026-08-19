@@ -1,0 +1,16 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0">Relatório de Clientes</h2>
+  <a href="/relatorios/clientes?exportar=excel" class="botao botao-secundario">⬇️ Exportar Excel</a>
+</div>
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>Email</th><th>Cidade</th></tr></thead>
+      <tbody>
+        <% clientes.forEach(c => { %>
+          <tr><td><%= c.nome %></td><td><%= c.cpf || '-' %></td><td><%= c.telefone || '-' %></td><td><%= c.email || '-' %></td><td><%= c.cidade || '-' %></td></tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

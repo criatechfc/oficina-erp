@@ -1,0 +1,47 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0">Oficinas cadastradas (<%= oficinas.length %>)</h2>
+  <div class="flex gap-12">
+    <a href="/<%= adminPath %>/oficinas/nova" class="botao botao-primario">+ Nova oficina</a>
+    <form action="/<%= adminPath %>/logout" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="botao botao-secundario">Sair</button>
+    </form>
+  </div>
+</div>
+
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead>
+        <tr><th>Oficina</th><th>Nicho</th><th>Plano</th><th>Usuários</th><th>Status</th><th>Criada em</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% if (!oficinas.length) { %>
+          <tr><td colspan="7" class="estado-vazio">Nenhuma oficina cadastrada ainda.</td></tr>
+        <% } %>
+        <% oficinas.forEach(of => { %>
+          <tr>
+            <td><%= of.nome %></td>
+            <td>
+              <% const icones = { moto: '🏍️ Moto', carro: '🚗 Carro', ambos: '🔧 Ambos' }; %>
+              <%= icones[of.nicho] || of.nicho %>
+            </td>
+            <td><span class="badge badge-azul"><%= of.plano %></span></td>
+            <td><%= of.totalUsuarios %></td>
+            <td><span class="badge <%= of.ativo ? 'badge-verde' : 'badge-vermelho' %>"><%= of.ativo ? 'Ativa' : 'Inativa' %></span></td>
+            <td><%= new Date(of.createdAt).toLocaleDateString('pt-BR') %></td>
+            <td class="flex gap-12">
+              <a href="/<%= adminPath %>/oficinas/<%= of._id %>" class="botao botao-secundario botao-pequeno">Gerenciar</a>
+              <form action="/<%= adminPath %>/oficinas/<%= of._id %>/status" method="POST" data-confirmar="<%= of.ativo ? 'Desativar' : 'Ativar' %> esta oficina?">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button type="submit" class="botao <%= of.ativo ? 'botao-perigo' : 'botao-primario' %> botao-pequeno">
+                  <%= of.ativo ? 'Desativar' : 'Ativar' %>
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<div class="painel">
+  <div class="painel-corpo">
+    <form action="<%= modo === 'criar' ? '/usuarios' : `/usuarios/${usuarioForm._id}?_method=PUT` %>" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="nome">Nome *</label>
+          <input type="text" id="nome" name="nome" required value="<%= usuarioForm.nome || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="email">E-mail *</label>
+          <input type="email" id="email" name="email" required value="<%= usuarioForm.email || '' %>" <%= modo === 'editar' ? 'disabled' : '' %>>
+        </div>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="perfil">Perfil *</label>
+          <select id="perfil" name="perfil" required>
+            <% perfis.forEach(p => { %>
+              <option value="<%= p %>" <%= usuarioForm.perfil === p ? 'selected' : '' %>><%= p %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" name="telefone" value="<%= usuarioForm.telefone || '' %>">
+        </div>
+      </div>
+
+      <% if (modo === 'criar') { %>
+        <div class="form-grupo">
+          <label for="senha">Senha inicial *</label>
+          <input type="password" id="senha" name="senha" required minlength="8">
+          <p class="campo-ajuda">Mín. 8 caracteres, com maiúscula, minúscula e número.</p>
+        </div>
+      <% } else { %>
+        <div class="form-grupo">
+          <label><input type="checkbox" name="ativo" style="width:auto; display:inline-block;" <%= usuarioForm.ativo ? 'checked' : '' %>> Usuário ativo</label>
+        </div>
+      <% } %>
+
+      <div class="flex gap-12">
+        <button type="submit" class="botao botao-primario">Salvar</button>
+        <a href="/usuarios" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<% if (modo === 'editar') { %>
+<div class="painel">
+  <div class="painel-cabecalho"><h2>Redefinir senha</h2></div>
+  <div class="painel-corpo">
+    <form action="/usuarios/<%= usuarioForm._id %>/redefinir-senha" method="POST" data-confirmar="Redefinir a senha deste usuário?">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-grupo">
+        <label for="novaSenha">Nova senha *</label>
+        <input type="password" id="novaSenha" name="novaSenha" required minlength="8">
+      </div>
+      <button type="submit" class="botao botao-perigo">Redefinir senha</button>
+    </form>
+  </div>
+</div>
+<% } %>

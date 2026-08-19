@@ -1,0 +1,20 @@
+<h2 class="mt-0 mb-16">Relatório de Mecânicos</h2>
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Mecânico</th><th>Serviços realizados</th><th>Valor gerado</th></tr></thead>
+      <tbody>
+        <% if (!mecanicos.length) { %>
+          <tr><td colspan="3" class="estado-vazio">Nenhum dado disponível ainda.</td></tr>
+        <% } %>
+        <% mecanicos.forEach(m => { %>
+          <tr>
+            <td><%= m._id?.nome || 'Não informado' %></td>
+            <td><%= m.totalServicos %></td>
+            <td><%= m.valorGerado.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

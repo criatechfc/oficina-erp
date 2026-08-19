@@ -1,0 +1,175 @@
+<div class="flex-entre mb-16">
+  <div>
+    <h2 class="mt-0 mb-0">Ordem de Serviço Nº <%= os.numero %></h2>
+    <p class="texto-suave texto-pequeno mt-0"><%= new Date(os.createdAt).toLocaleString('pt-BR') %></p>
+  </div>
+  <div class="flex gap-8">
+    <% if (os.cliente.whatsapp) { %>
+      <% const msgWhats = os.status === 'em_manutencao' ? montarMensagemConfirmacaoServico(os.cliente, os) : montarMensagemMotoPronta(os.cliente, os.moto); %>
+      <a href="<%= construirLinkWhatsApp(os.cliente.whatsapp, msgWhats) %>" target="_blank" class="botao botao-sucesso">📲 Avisar cliente no WhatsApp</a>
+    <% } %>
+    <a href="/ordens-servico/<%= os._id %>/pdf" target="_blank" class="botao botao-secundario">🖨️ Imprimir / PDF</a>
+  </div>
+</div>
+
+<div class="grid-cards" style="grid-template-columns: 2fr 1fr;">
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Detalhes</h2></div>
+    <div class="painel-corpo">
+      <p><strong>Cliente:</strong> <a href="/clientes/<%= os.cliente._id %>"><%= os.cliente.nome %></a> — <%= os.cliente.telefone %></p>
+      <p><strong>Moto:</strong> <a href="/motos/<%= os.moto._id %>"><%= os.moto.marca %> <%= os.moto.modelo %></a> — Placa <%= os.moto.placa %></p>
+      <p><strong>Mecânico:</strong> <%= os.mecanico?.nome || '-' %></p>
+      <p><strong>Problema informado:</strong><br><%= os.problemaInformado %></p>
+      <% if (os.diagnostico) { %><p><strong>Diagnóstico:</strong><br><%= os.diagnostico %></p><% } %>
+
+      <% if (os.checklistEntrada && (os.checklistEntrada.itens?.length || os.checklistEntrada.fotos?.length)) { %>
+        <h3>Checklist de entrada</h3>
+        <table class="mb-16">
+          <thead><tr><th>Item</th><th>Situação</th><th>Observação</th></tr></thead>
+          <tbody>
+            <% os.checklistEntrada.itens.forEach(item => { %>
+              <tr>
+                <td><%= item.item %></td>
+                <td>
+                  <% if (item.situacao === 'avaria') { %>
+                    <span class="badge badge-vermelho">Avaria</span>
+                  <% } else { %>
+                    <span class="badge badge-verde">OK</span>
+                  <% } %>
+                </td>
+                <td><%= item.observacao || '-' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% if (os.checklistEntrada.observacoesGerais) { %>
+          <p><strong>Observações gerais da entrada:</strong><br><%= os.checklistEntrada.observacoesGerais %></p>
+        <% } %>
+        <% if (os.checklistEntrada.fotos && os.checklistEntrada.fotos.length) { %>
+          <div class="galeria-fotos mb-16">
+            <% os.checklistEntrada.fotos.forEach(f => { %><img src="<%= f %>" alt="Foto do checklist de entrada"><% }) %>
+          </div>
+        <% } %>
+      <% } %>
+
+      <h3>Peças utilizadas</h3>
+      <% if (!os.pecasUtilizadas.length) { %><p class="texto-suave texto-pequeno">Nenhuma peça utilizada.</p><% } %>
+      <table>
+        <% os.pecasUtilizadas.forEach(p => { %>
+          <tr><td><%= p.quantidade %>x <%= p.nome %></td><td class="texto-centro"><%= p.precoUnitario.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td><td class="texto-centro negrito"><%= (p.quantidade * p.precoUnitario).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td></tr>
+        <% }) %>
+      </table>
+
+      <h3>Serviços realizados</h3>
+      <% if (!os.servicosRealizados.length) { %><p class="texto-suave texto-pequeno">Nenhum serviço registrado.</p><% } %>
+      <table>
+        <% os.servicosRealizados.forEach(s => { %>
+          <tr><td><%= s.descricao %></td><td class="texto-centro negrito"><%= s.valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td></tr>
+        <% }) %>
+      </table>
+
+      <div style="text-align:right; margin-top:16px;">
+        <p class="texto-suave">Valor peças: <%= os.valorPecas.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+        <p class="texto-suave">Mão de obra: <%= os.valorMaoDeObra.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+        <p class="texto-suave">Desconto: <%= os.desconto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+        <p style="font-size:20px;" class="negrito">Total: <%= os.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="painel">
+      <div class="painel-cabecalho"><h2>Portal do cliente</h2></div>
+      <div class="painel-corpo">
+        <p class="texto-suave texto-pequeno mb-16">Envie este link (ou o QR code) pro cliente. Ele acompanha o status em tempo real e, se a OS estiver "Aguardando Aprovação", pode aprovar ou recusar o orçamento pelo celular, sem precisar ligar.</p>
+
+        <% if (os.aprovacaoStatus === 'aprovado') { %>
+          <p class="mb-16"><span class="badge badge-verde">✅ Orçamento aprovado pelo cliente</span></p>
+        <% } else if (os.aprovacaoStatus === 'recusado') { %>
+          <p class="mb-16"><span class="badge badge-vermelho">❌ Orçamento recusado pelo cliente</span></p>
+          <% if (os.aprovacaoObservacao) { %><p class="texto-pequeno mb-16"><strong>Motivo:</strong> <%= os.aprovacaoObservacao %></p><% } %>
+        <% } else if (os.status === 'aguardando_aprovacao') { %>
+          <p class="mb-16"><span class="badge badge-azul">⏳ Aguardando aprovação do cliente</span></p>
+        <% } %>
+
+        <div class="flex gap-8 mb-16">
+          <input type="text" id="link-portal-cliente" value="<%= linkPublico %>" readonly style="flex:1;">
+          <button type="button" id="botao-copiar-link" class="botao botao-secundario botao-pequeno">Copiar</button>
+        </div>
+
+        <div class="flex gap-8 mb-16">
+          <% if (os.cliente.whatsapp) { %>
+            <a href="<%= construirLinkWhatsApp(os.cliente.whatsapp, montarMensagemLinkAprovacao(os.cliente, os, linkPublico)) %>" target="_blank" class="botao botao-sucesso" style="flex:1;">📲 Enviar link no WhatsApp</a>
+          <% } %>
+        </div>
+
+        <div id="qrcode-portal-cliente" class="texto-centro"></div>
+      </div>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho"><h2>Status</h2></div>
+      <div class="painel-corpo">
+        <form action="/ordens-servico/<%= os._id %>/status" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="form-grupo">
+            <label for="status">Alterar status</label>
+            <select id="status" name="status">
+              <% statusLista.forEach(s => { %>
+                <option value="<%= s %>" <%= os.status === s ? 'selected' : '' %>><%= rotuloStatusOS(s) %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="form-grupo">
+            <label for="observacao">Observação</label>
+            <textarea id="observacao" name="observacao"></textarea>
+          </div>
+          <button type="submit" class="botao botao-primario botao-bloco">Atualizar status</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho"><h2>Histórico</h2></div>
+      <div class="painel-corpo">
+        <ul class="timeline">
+          <% os.historicoStatus.slice().reverse().forEach(h => { %>
+            <li>
+              <strong><%= rotuloStatusOS(h.status) %></strong>
+              <p class="texto-suave texto-pequeno mb-0"><%= new Date(h.data).toLocaleString('pt-BR') %> — <%= h.usuario?.nome || '-' %></p>
+              <% if (h.observacao) { %><p class="texto-pequeno mb-0"><%= h.observacao %></p><% } %>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('qrcode-portal-cliente');
+    const link = document.getElementById('link-portal-cliente')?.value;
+    if (container && link && typeof QRCode !== 'undefined') {
+      // eslint-disable-next-line no-new
+      new QRCode(container, { text: link, width: 160, height: 160, correctLevel: QRCode.CorrectLevel.M });
+    }
+
+    const botaoCopiar = document.getElementById('botao-copiar-link');
+    const campoLink = document.getElementById('link-portal-cliente');
+    if (botaoCopiar && campoLink) {
+      botaoCopiar.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(campoLink.value);
+          const textoOriginal = botaoCopiar.textContent;
+          botaoCopiar.textContent = 'Copiado!';
+          setTimeout(() => { botaoCopiar.textContent = textoOriginal; }, 2000);
+        } catch (err) {
+          campoLink.select();
+          document.execCommand('copy');
+        }
+      });
+    }
+  });
+</script>

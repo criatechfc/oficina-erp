@@ -1,0 +1,62 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0">Nova oficina</h2>
+  <a href="/<%= adminPath %>" class="botao botao-secundario">Voltar</a>
+</div>
+
+<div class="painel">
+  <div class="painel-corpo">
+    <% if (mensagemErro) { %><div class="alerta alerta-erro"><%= mensagemErro %></div><% } %>
+
+    <form action="/<%= adminPath %>/oficinas" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-grupo">
+        <label for="nomeOficina">Nome da oficina *</label>
+        <input type="text" id="nomeOficina" name="nomeOficina" required autofocus value="<%= valores?.nomeOficina || '' %>">
+      </div>
+
+      <div class="form-grupo">
+        <label>Nicho *</label>
+        <div class="opcoes-nicho" style="display:flex; gap:10px; margin-top:6px;">
+          <% const nichoAtual = valores?.nicho || 'ambos'; %>
+          <% [['moto','🏍️ Motos'], ['carro','🚗 Carros'], ['ambos','🔧 Ambos']].forEach(function(opt) { %>
+            <label style="flex:1; border:1px solid var(--borda, #333); border-radius:8px; padding:12px; text-align:center; cursor:pointer;">
+              <input type="radio" name="nicho" value="<%= opt[0] %>" <%= nichoAtual === opt[0] ? 'checked' : '' %> style="display:block; margin:0 auto 6px;">
+              <%= opt[1] %>
+            </label>
+          <% }); %>
+        </div>
+      </div>
+
+      <hr style="margin:20px 0; border-color:var(--borda,#333);">
+      <p class="texto-suave">Dados do administrador desta oficina:</p>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="nomeAdmin">Nome *</label>
+          <input type="text" id="nomeAdmin" name="nomeAdmin" required value="<%= valores?.nomeAdmin || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="email">E-mail *</label>
+          <input type="email" id="email" name="email" required value="<%= valores?.email || '' %>">
+        </div>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="senha">Senha *</label>
+          <input type="password" id="senha" name="senha" required minlength="8">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="confirmarSenha">Confirmar senha *</label>
+          <input type="password" id="confirmarSenha" name="confirmarSenha" required minlength="8">
+        </div>
+      </div>
+
+      <div class="flex gap-12">
+        <button type="submit" class="botao botao-primario">Criar oficina</button>
+        <a href="/<%= adminPath %>" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>

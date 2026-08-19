@@ -1,0 +1,27 @@
+<header class="topbar">
+  <div class="flex gap-12" style="align-items:center;">
+    <button class="botao-icone menu-toggle" type="button" aria-label="Abrir menu">☰</button>
+    <h1><%= titulo %></h1>
+  </div>
+
+  <div class="topbar-acoes">
+    <button class="botao-icone" id="botao-tema" type="button" title="Alternar modo escuro">🌙</button>
+
+    <a href="/perfil" class="usuario-chip" title="Meu perfil">
+      <% if (usuarioLogado.foto) { %>
+        <img src="<%= usuarioLogado.foto %>" alt="Foto">
+      <% } else { %>
+        <span class="avatar-fallback"><%= usuarioLogado.nome.charAt(0).toUpperCase() %></span>
+      <% } %>
+      <span>
+        <span class="nome" style="display:block;"><%= usuarioLogado.nome %></span>
+        <span class="perfil"><%= usuarioLogado.perfil %></span>
+      </span>
+    </a>
+
+    <form action="/logout" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="botao botao-secundario botao-pequeno" type="submit">Sair</button>
+    </form>
+  </div>
+</header>

@@ -1,0 +1,22 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0">Relatório de Estoque</h2>
+  <a href="/relatorios/estoque?exportar=excel" class="botao botao-secundario">⬇️ Exportar Excel</a>
+</div>
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Código</th><th>Nome</th><th>Quantidade</th><th>Mínimo</th><th>Custo</th><th>Venda</th></tr></thead>
+      <tbody>
+        <% pecas.forEach(p => { %>
+          <tr>
+            <td><%= p.codigo %></td><td><%= p.nome %></td>
+            <td><span class="badge <%= p.quantidade <= p.estoqueMinimo ? 'badge-vermelho' : 'badge-verde' %>"><%= p.quantidade %></span></td>
+            <td><%= p.estoqueMinimo %></td>
+            <td><%= p.precoCusto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><%= p.precoVenda.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

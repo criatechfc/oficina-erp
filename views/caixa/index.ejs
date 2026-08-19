@@ -1,0 +1,145 @@
+<% if (!caixaAberto) { %>
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Abrir Caixa</h2></div>
+    <div class="painel-corpo">
+      <form action="/caixa/abrir" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-linha mb-16">
+          <div class="form-grupo mb-0">
+            <label for="valorAbertura">Valor de abertura (R$) *</label>
+            <input type="number" step="0.01" id="valorAbertura" name="valorAbertura" required value="0">
+          </div>
+          <div class="form-grupo mb-0">
+            <label for="observacoes">Observações</label>
+            <input type="text" id="observacoes" name="observacoes">
+          </div>
+        </div>
+        <button type="submit" class="botao botao-primario">Abrir Caixa</button>
+      </form>
+    </div>
+  </div>
+<% } else { %>
+  <div class="grid-cards" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="card card-indicador">
+      <div><div class="rotulo">Saldo atual</div><div class="valor"><%= resumo.saldo.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+      <div class="icone-card bg-verde">💰</div>
+    </div>
+    <div class="card card-indicador">
+      <div><div class="rotulo">Entradas</div><div class="valor"><%= resumo.entradas.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+      <div class="icone-card bg-azul">⬆️</div>
+    </div>
+    <div class="card card-indicador">
+      <div><div class="rotulo">Saídas</div><div class="valor"><%= resumo.saidas.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></div></div>
+      <div class="icone-card bg-vermelho">⬇️</div>
+    </div>
+  </div>
+
+  <div class="grid-cards" style="grid-template-columns: 1fr 1fr;">
+    <div class="painel">
+      <div class="painel-cabecalho"><h2>Nova movimentação</h2></div>
+      <div class="painel-corpo">
+        <form action="/caixa/movimentacao" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="form-grupo">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo">
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+              <option value="sangria">Sangria</option>
+              <option value="reforco">Reforço</option>
+            </select>
+          </div>
+          <div class="form-linha mb-16">
+            <div class="form-grupo mb-0">
+              <label for="valor">Valor (R$) *</label>
+              <input type="number" step="0.01" id="valor" name="valor" required>
+            </div>
+            <div class="form-grupo mb-0">
+              <label for="formaPagamento">Forma de pagamento</label>
+              <select id="formaPagamento" name="formaPagamento">
+                <option value="dinheiro">Dinheiro</option>
+                <option value="pix">Pix</option>
+                <option value="cartao_debito">Cartão débito</option>
+                <option value="cartao_credito">Cartão crédito</option>
+                <option value="boleto">Boleto</option>
+                <option value="transferencia">Transferência</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grupo">
+            <label for="descricao">Descrição *</label>
+            <input type="text" id="descricao" name="descricao" required>
+          </div>
+          <button type="submit" class="botao botao-primario">Registrar</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho"><h2>Fechar caixa</h2></div>
+      <div class="painel-corpo">
+        <form action="/caixa/fechar" method="POST" data-confirmar="Confirma o fechamento do caixa?">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="form-grupo">
+            <label for="valorFechamentoInformado">Valor contado em caixa (R$) *</label>
+            <input type="number" step="0.01" id="valorFechamentoInformado" name="valorFechamentoInformado" required>
+          </div>
+          <div class="form-grupo">
+            <label for="observacoesFechamento">Observações</label>
+            <textarea id="observacoesFechamento" name="observacoes"></textarea>
+          </div>
+          <button type="submit" class="botao botao-perigo">Fechar Caixa</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Movimentações de hoje</h2></div>
+    <div class="tabela-wrap">
+      <table>
+        <thead><tr><th>Hora</th><th>Tipo</th><th>Descrição</th><th>Forma</th><th>Valor</th><th>Usuário</th></tr></thead>
+        <tbody>
+          <% if (!resumo.movimentacoes.length) { %>
+            <tr><td colspan="6" class="estado-vazio">Nenhuma movimentação registrada.</td></tr>
+          <% } %>
+          <% const mapaTipoCaixa = { entrada:'badge-verde', saida:'badge-vermelho', sangria:'badge-amarelo', reforco:'badge-azul' }; %>
+          <% resumo.movimentacoes.forEach(m => { %>
+            <tr>
+              <td><%= new Date(m.createdAt).toLocaleTimeString('pt-BR') %></td>
+              <td><span class="badge <%= mapaTipoCaixa[m.tipo] %>"><%= m.tipo %></span></td>
+              <td><%= m.descricao %></td>
+              <td><%= m.formaPagamento.replace('_',' ') %></td>
+              <td><%= m.valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+              <td><%= m.usuario?.nome || '-' %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% } %>
+
+<div class="painel">
+  <div class="painel-cabecalho"><h2>Histórico de caixas fechados</h2></div>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Abertura</th><th>Fechamento</th><th>Abertura (R$)</th><th>Calculado</th><th>Informado</th><th>Diferença</th></tr></thead>
+      <tbody>
+        <% if (!historico.length) { %>
+          <tr><td colspan="6" class="estado-vazio">Nenhum caixa fechado ainda.</td></tr>
+        <% } %>
+        <% historico.forEach(c => { %>
+          <tr>
+            <td><%= new Date(c.aberturaData).toLocaleString('pt-BR') %></td>
+            <td><%= c.fechamentoData ? new Date(c.fechamentoData).toLocaleString('pt-BR') : '-' %></td>
+            <td><%= c.valorAbertura.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><%= (c.valorFechamentoCalculado || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><%= (c.valorFechamentoInformado || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><span class="badge <%= c.diferenca === 0 ? 'badge-verde' : 'badge-vermelho' %>"><%= (c.diferenca || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></span></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<div class="tela-login">
+  <div class="caixa-login" style="max-width:480px;">
+    <div class="logo-login">
+      <span class="icone-moto">🔧</span>
+      <span>Oficina ERP</span>
+    </div>
+    <h1>Criar sua oficina</h1>
+    <p class="subtitulo">Cada oficina cadastrada tem seus próprios clientes, veículos, estoque e funcionários.</p>
+
+    <% if (mensagemErro) { %><div class="alerta alerta-erro"><%= mensagemErro %></div><% } %>
+
+    <form action="/cadastro" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-grupo">
+        <label for="nomeOficina">Nome da oficina</label>
+        <input type="text" id="nomeOficina" name="nomeOficina" required autofocus
+               value="<%= valores?.nomeOficina || '' %>">
+      </div>
+
+      <div class="form-grupo">
+        <label>O que sua oficina atende?</label>
+        <div class="opcoes-nicho" style="display:flex; gap:10px; margin-top:6px;">
+          <% const nichoAtual = valores?.nicho || 'ambos'; %>
+          <% [['moto','🏍️ Motos'], ['carro','🚗 Carros'], ['ambos','🔧 Ambos']].forEach(function(opt) { %>
+            <label style="flex:1; border:1px solid var(--borda, #333); border-radius:8px; padding:12px; text-align:center; cursor:pointer;">
+              <input type="radio" name="nicho" value="<%= opt[0] %>" <%= nichoAtual === opt[0] ? 'checked' : '' %> style="display:block; margin:0 auto 6px;">
+              <%= opt[1] %>
+            </label>
+          <% }); %>
+        </div>
+      </div>
+
+      <hr style="margin:20px 0; border-color:var(--borda,#333);">
+
+      <div class="form-grupo">
+        <label for="nomeAdmin">Seu nome (administrador)</label>
+        <input type="text" id="nomeAdmin" name="nomeAdmin" required
+               value="<%= valores?.nomeAdmin || '' %>">
+      </div>
+
+      <div class="form-grupo">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required
+               value="<%= valores?.email || '' %>">
+      </div>
+
+      <div class="form-grupo">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" required minlength="8">
+        <small class="texto-suave">Mínimo 8 caracteres, com maiúscula, minúscula e número.</small>
+      </div>
+
+      <div class="form-grupo">
+        <label for="confirmarSenha">Confirmar senha</label>
+        <input type="password" id="confirmarSenha" name="confirmarSenha" required minlength="8">
+      </div>
+
+      <button type="submit" class="botao botao-primario botao-bloco">Criar oficina</button>
+    </form>
+
+    <p class="texto-pequeno texto-suave" style="text-align:center; margin-top:18px;">
+      Já tem uma conta? <a href="/login">Entrar</a>
+    </p>
+  </div>
+</div>

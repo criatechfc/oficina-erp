@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etiqueta - <%= peca.nome %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.12.3/JsBarcode.all.min.js"></script>
+</head>
+<body>
+  <div class="etiqueta-pagina">
+    <div class="etiqueta-caixa">
+      <div class="etiqueta-nome"><%= peca.nome %></div>
+      <svg id="barcode"></svg>
+    </div>
+
+    <div class="nao-imprimir flex gap-12">
+      <button type="button" class="botao botao-primario" onclick="window.print()">Imprimir</button>
+      <a href="/estoque/<%= peca._id %>/editar" class="botao botao-secundario">Voltar</a>
+    </div>
+  </div>
+
+  <script>
+    // Usa o código de barras cadastrado; se a peça não tiver um (só tem
+    // código interno), gera a etiqueta a partir do código interno mesmo —
+    // assim toda peça consegue ter uma etiqueta escaneável, mesmo sem
+    // código de fábrica.
+    const valor = <%- JSON.stringify(peca.codigoBarras || peca.codigo) %>;
+    JsBarcode('#barcode', valor, {
+      format: 'CODE128',
+      width: 2,
+      height: 70,
+      fontSize: 16,
+      margin: 8
+    });
+
+    // Facilita imprimir mais de uma etiqueta da mesma peça (ex.: colar em
+    // várias unidades do mesmo item em estoque).
+  </script>
+</body>
+</html>

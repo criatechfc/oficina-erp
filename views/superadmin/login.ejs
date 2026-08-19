@@ -1,0 +1,25 @@
+<div class="tela-login">
+  <div class="caixa-login">
+    <div class="logo-login">
+      <span class="icone-moto">🔒</span>
+      <span>Painel do dono</span>
+    </div>
+    <h1>Acesso restrito</h1>
+    <p class="subtitulo">Área exclusiva para gerenciar todas as oficinas do sistema.</p>
+
+    <% if (mensagemErro) { %><div class="alerta alerta-erro"><%= mensagemErro %></div><% } %>
+
+    <form action="/<%= adminPath %>/login" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-grupo">
+        <label for="chave">Chave secreta</label>
+        <input type="password" id="chave" name="chave" required autofocus>
+      </div>
+      <button type="submit" class="botao botao-primario botao-bloco">Entrar</button>
+    </form>
+
+    <p class="texto-pequeno texto-suave" style="text-align:center; margin-top:18px;">
+      <a href="/login">Voltar ao login normal</a>
+    </p>
+  </div>
+</div>

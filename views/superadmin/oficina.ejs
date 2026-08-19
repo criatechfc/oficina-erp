@@ -1,0 +1,83 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0"><%= oficina.nome %> <span class="badge <%= oficina.ativo ? 'badge-verde' : 'badge-vermelho' %>"><%= oficina.ativo ? 'Ativa' : 'Inativa' %></span></h2>
+  <a href="/<%= adminPath %>" class="botao botao-secundario">Voltar</a>
+</div>
+
+<div class="painel mb-16">
+  <div class="painel-cabecalho"><h2>Dados da oficina</h2></div>
+  <div class="painel-corpo">
+    <form action="/<%= adminPath %>/oficinas/<%= oficina._id %>" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" value="<%= oficina.nome %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="nicho">Nicho</label>
+          <select id="nicho" name="nicho">
+            <option value="moto" <%= oficina.nicho === 'moto' ? 'selected' : '' %>>🏍️ Motos</option>
+            <option value="carro" <%= oficina.nicho === 'carro' ? 'selected' : '' %>>🚗 Carros</option>
+            <option value="ambos" <%= oficina.nicho === 'ambos' ? 'selected' : '' %>>🔧 Ambos</option>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="plano">Plano</label>
+          <select id="plano" name="plano">
+            <option value="gratis" <%= oficina.plano === 'gratis' ? 'selected' : '' %>>Grátis</option>
+            <option value="basico" <%= oficina.plano === 'basico' ? 'selected' : '' %>>Básico</option>
+            <option value="pro" <%= oficina.plano === 'pro' ? 'selected' : '' %>>Pro</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="botao botao-primario">Salvar</button>
+    </form>
+
+    <hr style="margin:20px 0; border-color:var(--borda,#333);">
+
+    <form action="/<%= adminPath %>/oficinas/<%= oficina._id %>/status" method="POST" data-confirmar="<%= oficina.ativo ? 'Desativar' : 'Ativar' %> esta oficina? Usuários dela <%= oficina.ativo ? 'não conseguirão mais entrar' : 'voltarão a conseguir entrar' %>.">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="botao <%= oficina.ativo ? 'botao-perigo' : 'botao-primario' %>">
+        <%= oficina.ativo ? 'Desativar oficina' : 'Ativar oficina' %>
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="painel">
+  <div class="painel-cabecalho"><h2>Usuários (<%= usuarios.length %>)</h2></div>
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <% usuarios.forEach(u => { %>
+          <tr>
+            <td><%= u.nome %></td>
+            <td>
+              <form action="/<%= adminPath %>/oficinas/<%= oficina._id %>/usuarios/<%= u._id %>/email" method="POST" class="flex gap-12" style="align-items:center;">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="email" name="email" value="<%= u.email %>" style="min-width:220px;">
+                <button type="submit" class="botao botao-secundario botao-pequeno">Salvar e-mail</button>
+              </form>
+            </td>
+            <td><span class="badge badge-azul"><%= u.perfil %></span></td>
+            <td><span class="badge <%= u.ativo ? 'badge-verde' : 'badge-vermelho' %>"><%= u.ativo ? 'Ativo' : 'Inativo' %></span></td>
+            <td class="flex gap-12" style="flex-wrap:wrap;">
+              <form action="/<%= adminPath %>/oficinas/<%= oficina._id %>/usuarios/<%= u._id %>/status" method="POST" data-confirmar="<%= u.ativo ? 'Desativar' : 'Ativar' %> este usuário?">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button type="submit" class="botao <%= u.ativo ? 'botao-perigo' : 'botao-primario' %> botao-pequeno">
+                  <%= u.ativo ? 'Desativar' : 'Ativar' %>
+                </button>
+              </form>
+              <form action="/<%= adminPath %>/oficinas/<%= oficina._id %>/usuarios/<%= u._id %>/senha" method="POST" class="flex gap-12" style="align-items:center;" data-confirmar="Redefinir a senha de <%= u.nome %>?">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="password" name="novaSenha" placeholder="Nova senha" minlength="8" style="min-width:160px;">
+                <button type="submit" class="botao botao-secundario botao-pequeno">Redefinir senha</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

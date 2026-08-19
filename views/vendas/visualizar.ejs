@@ -1,0 +1,76 @@
+<div class="flex-entre mb-16">
+  <div>
+    <h2 class="mt-0 mb-0"><%= venda.status === 'orcamento' ? 'Orçamento' : 'Venda' %> Nº <%= venda.numero %></h2>
+    <p class="texto-suave texto-pequeno mt-0"><%= new Date(venda.createdAt).toLocaleString('pt-BR') %> — <%= venda.cliente?.nome || 'Consumidor final' %></p>
+  </div>
+  <span class="badge badge-azul"><%= venda.status.replace('_',' ') %></span>
+</div>
+
+<% if (venda.cliente?.whatsapp) { %>
+  <div class="mb-16">
+    <a href="<%= construirLinkWhatsApp(venda.cliente.whatsapp, montarMensagemOrcamento(venda.cliente, venda)) %>" target="_blank" class="botao botao-sucesso">📲 Enviar orçamento no WhatsApp</a>
+  </div>
+<% } %>
+
+<div class="painel">
+  <div class="painel-corpo">
+    <table>
+      <thead><tr><th>Item</th><th>Qtd</th><th>Preço unit.</th><th>Subtotal</th></tr></thead>
+      <tbody>
+        <% venda.itens.forEach(i => { %>
+          <tr>
+            <td><%= i.descricao %></td>
+            <td><%= i.quantidade %></td>
+            <td><%= i.precoUnitario.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><%= (i.quantidade * i.precoUnitario).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <div style="text-align:right; margin-top:16px;">
+      <p class="texto-suave">Subtotal: <%= venda.subtotal.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+      <p class="texto-suave">Desconto: <%= venda.desconto.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+      <p style="font-size:20px;" class="negrito">Total: <%= venda.total.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></p>
+    </div>
+  </div>
+</div>
+
+<% if (venda.status === 'orcamento') { %>
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Confirmar como venda</h2></div>
+    <div class="painel-corpo">
+      <form action="/vendas/<%= venda._id %>/confirmar" method="POST" data-confirmar="Confirmar este orçamento como venda? O estoque será baixado.">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-grupo">
+          <label for="formaPagamento">Forma de pagamento</label>
+          <select id="formaPagamento" name="formaPagamento">
+            <option value="dinheiro">Dinheiro</option>
+            <option value="pix">Pix</option>
+            <option value="cartao_debito">Cartão débito</option>
+            <option value="cartao_credito">Cartão crédito</option>
+          </select>
+        </div>
+        <button type="submit" class="botao botao-sucesso">Confirmar Venda</button>
+      </form>
+    </div>
+  </div>
+<% } %>
+
+<% if (venda.status !== 'convertida_os' && venda.status !== 'cancelada' && venda.cliente) { %>
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Converter em Ordem de Serviço</h2></div>
+    <div class="painel-corpo">
+      <form action="/vendas/<%= venda._id %>/converter-os" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-grupo">
+          <label for="motoId">Moto</label>
+          <select id="motoId" name="motoId" onfocus="carregarMotosDoCliente('<%= venda.cliente._id %>', 'motoId', '/vendas/motos-por-cliente')" required>
+            <option value="">Clique para carregar motos do cliente</option>
+          </select>
+        </div>
+        <button type="submit" class="botao botao-primario">Converter em OS</button>
+      </form>
+    </div>
+  </div>
+<% } %>

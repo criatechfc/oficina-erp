@@ -1,0 +1,179 @@
+<div class="painel">
+  <div class="painel-corpo">
+    <form action="<%= modo === 'criar' ? '/motos' : `/motos/${moto._id}?_method=PUT` %>" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-grupo">
+        <label for="cliente">Cliente *</label>
+        <select id="cliente" name="cliente" required>
+          <option value="">Selecione o cliente</option>
+          <% clientes.forEach(c => { %>
+            <option value="<%= c._id %>" <%= String(moto.cliente?._id || moto.cliente || '') === String(c._id) ? 'selected' : '' %>><%= c.nome %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <% const nicho = oficinaLogada?.nicho || 'ambos'; %>
+      <% const tipoAtual = moto.tipo || (nicho === 'carro' ? 'carro' : 'moto'); %>
+      <% if (nicho === 'ambos') { %>
+        <div class="form-grupo">
+          <label for="tipo">Tipo de veículo *</label>
+          <select id="tipo" name="tipo" required onchange="alternarCamposTipo(this.value)">
+            <option value="moto" <%= tipoAtual === 'moto' ? 'selected' : '' %>>🏍️ Moto</option>
+            <option value="carro" <%= tipoAtual === 'carro' ? 'selected' : '' %>>🚗 Carro</option>
+          </select>
+        </div>
+      <% } else { %>
+        <input type="hidden" name="tipo" value="<%= nicho %>">
+      <% } %>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="marca">Marca *</label>
+          <input type="text" id="marca" name="marca" required value="<%= moto.marca || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="modelo">Modelo *</label>
+          <input type="text" id="modelo" name="modelo" required value="<%= moto.modelo || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="ano">Ano</label>
+          <input type="number" id="ano" name="ano" value="<%= moto.ano || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="cor">Cor</label>
+          <input type="text" id="cor" name="cor" value="<%= moto.cor || '' %>">
+        </div>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="placa">Placa *</label>
+          <div class="flex gap-8">
+            <input type="text" id="placa" name="placa" required value="<%= moto.placa || '' %>">
+            <button type="button" id="botao-buscar-placa" class="botao botao-secundario botao-pequeno" title="Buscar marca/modelo/ano pela placa">🔍 Buscar</button>
+          </div>
+          <small id="busca-placa-feedback"></small>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="chassi">Chassi</label>
+          <input type="text" id="chassi" name="chassi" value="<%= moto.chassi || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="motor">Motor</label>
+          <input type="text" id="motor" name="motor" value="<%= moto.motor || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="quilometragem">Quilometragem</label>
+          <input type="number" id="quilometragem" name="quilometragem" value="<%= moto.quilometragem || 0 %>">
+        </div>
+      </div>
+
+      <div class="form-linha mb-16" id="campos-moto" style="<%= tipoAtual === 'carro' ? 'display:none' : '' %>">
+        <div class="form-grupo mb-0">
+          <label for="cilindrada">Cilindrada (cc)</label>
+          <input type="number" id="cilindrada" name="cilindrada" value="<%= moto.cilindrada || '' %>">
+        </div>
+      </div>
+
+      <div class="form-linha mb-16" id="campos-carro" style="<%= tipoAtual === 'moto' ? 'display:none' : '' %>">
+        <div class="form-grupo mb-0">
+          <label for="numeroPortas">Nº de portas</label>
+          <input type="number" id="numeroPortas" name="numeroPortas" value="<%= moto.numeroPortas || '' %>">
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="cambio">Câmbio</label>
+          <select id="cambio" name="cambio">
+            <option value="">Selecione</option>
+            <option value="manual" <%= moto.cambio === 'manual' ? 'selected' : '' %>>Manual</option>
+            <option value="automatico" <%= moto.cambio === 'automatico' ? 'selected' : '' %>>Automático</option>
+            <option value="cvt" <%= moto.cambio === 'cvt' ? 'selected' : '' %>>CVT</option>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="combustivel">Combustível</label>
+          <select id="combustivel" name="combustivel">
+            <option value="">Selecione</option>
+            <% ['gasolina','etanol','flex','diesel','eletrico','hibrido'].forEach(c => { %>
+              <option value="<%= c %>" <%= moto.combustivel === c ? 'selected' : '' %>><%= c %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+
+      <script>
+        function alternarCamposTipo(tipo) {
+          document.getElementById('campos-moto').style.display = tipo === 'carro' ? 'none' : '';
+          document.getElementById('campos-carro').style.display = tipo === 'moto' ? 'none' : '';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          const botaoBuscarPlaca = document.getElementById('botao-buscar-placa');
+          const feedback = document.getElementById('busca-placa-feedback');
+          if (!botaoBuscarPlaca) return;
+
+          botaoBuscarPlaca.addEventListener('click', async () => {
+            const placa = document.getElementById('placa').value.trim();
+            if (!placa) return;
+
+            botaoBuscarPlaca.disabled = true;
+            feedback.classList.remove('texto-erro');
+            feedback.textContent = 'Buscando...';
+
+            try {
+              const resposta = await fetch(`/motos/buscar-placa/${encodeURIComponent(placa)}`);
+              const dados = await resposta.json();
+
+              if (dados.naoConfigurado) {
+                feedback.textContent = dados.mensagem;
+                return;
+              }
+              if (!dados.sucesso) {
+                feedback.classList.add('texto-erro');
+                feedback.textContent = dados.mensagem || 'Não encontrado.';
+                return;
+              }
+
+              const v = dados.veiculo;
+              if (v.marca) document.getElementById('marca').value = v.marca;
+              if (v.modelo) document.getElementById('modelo').value = v.modelo;
+              if (v.ano) document.getElementById('ano').value = v.ano;
+              if (v.cor) document.getElementById('cor').value = v.cor;
+              if (v.chassi) document.getElementById('chassi').value = v.chassi;
+              const campoCombustivel = document.getElementById('combustivel');
+              if (v.combustivel && campoCombustivel) campoCombustivel.value = v.combustivel;
+
+              feedback.textContent = 'Dados preenchidos. Confira antes de salvar.';
+            } catch (err) {
+              feedback.classList.add('texto-erro');
+              feedback.textContent = 'Erro ao buscar. Preencha manualmente.';
+            } finally {
+              botaoBuscarPlaca.disabled = false;
+            }
+          });
+        });
+      </script>
+
+      <div class="form-grupo">
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" name="observacoes"><%= moto.observacoes || '' %></textarea>
+      </div>
+
+      <div class="form-grupo">
+        <label for="fotos">Fotos</label>
+        <input type="file" id="fotos" name="fotos" accept="image/*" multiple>
+      </div>
+
+      <% if (moto.fotos && moto.fotos.length) { %>
+        <div class="galeria-fotos mb-16">
+          <% moto.fotos.forEach(f => { %><img src="<%= f %>" alt="Foto da moto"><% }) %>
+        </div>
+      <% } %>
+
+      <div class="flex gap-12">
+        <button type="submit" class="botao botao-primario">Salvar</button>
+        <a href="/motos" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,236 @@
+<div class="painel">
+  <div class="painel-corpo">
+    <form action="/ordens-servico" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="form-grupo">
+        <label for="buscaPlacaOS">Placa do veículo</label>
+        <div class="flex gap-8">
+          <input type="text" id="buscaPlacaOS" placeholder="Digite a placa e aperte Enter" autocomplete="off" style="max-width:220px; text-transform:uppercase;">
+          <button type="button" id="buscaPlacaOS-botao" class="botao botao-secundario">Buscar</button>
+        </div>
+        <small id="buscaPlacaOS-feedback"></small>
+      </div>
+
+      <div class="form-linha mb-16">
+        <div class="form-grupo mb-0">
+          <label for="cliente">Cliente *</label>
+          <select id="cliente" name="cliente" required onchange="carregarMotosDoCliente(this.value, 'moto', '/ordens-servico/motos-por-cliente')">
+            <option value="">Selecione o cliente</option>
+            <% clientes.forEach(c => { %>
+              <option value="<%= c._id %>" <%= clienteSelecionado == c._id ? 'selected' : '' %>><%= c.nome %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="moto">Moto *</label>
+          <select id="moto" name="moto" required>
+            <option value="">Selecione o cliente primeiro</option>
+            <% motos.forEach(m => { %>
+              <option value="<%= m._id %>"><%= m.marca %> <%= m.modelo %> - <%= m.placa %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="mecanico">Mecânico responsável</label>
+          <select id="mecanico" name="mecanico">
+            <option value="">Selecione</option>
+            <% mecanicos.forEach(m => { %><option value="<%= m._id %>"><%= m.nome %></option><% }) %>
+          </select>
+        </div>
+        <div class="form-grupo mb-0">
+          <label for="quilometragemEntrada">Quilometragem de entrada</label>
+          <input type="number" id="quilometragemEntrada" name="quilometragemEntrada">
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label for="problemaInformado">Problema informado *</label>
+        <textarea id="problemaInformado" name="problemaInformado" required></textarea>
+      </div>
+
+      <div class="form-grupo">
+        <label for="diagnostico">Diagnóstico</label>
+        <textarea id="diagnostico" name="diagnostico"></textarea>
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--cor-borda); margin:20px 0;">
+
+      <div class="flex-entre mb-16">
+        <h3 class="mb-0">Checklist de entrada</h3>
+        <span class="texto-suave texto-pequeno">Registre o estado do veículo ANTES de mexer nele — protege a oficina de disputa por avaria que já existia</span>
+      </div>
+
+      <div class="tabela-wrap mb-16">
+        <table>
+          <thead>
+            <tr><th>Item</th><th>Situação</th><th>Observação (se houver avaria)</th></tr>
+          </thead>
+          <tbody>
+            <% const itensChecklist = ['Pintura / lataria', 'Para-brisa / vidros', 'Retrovisores', 'Rodas / pneus', 'Faróis / lanternas', 'Estofamento / bancos', 'Combustível', 'Itens no veículo (documento, som, etc.)']; %>
+            <% itensChecklist.forEach((item, i) => { %>
+              <tr>
+                <td>
+                  <%= item %>
+                  <input type="hidden" name="checklistItem" value="<%= item %>">
+                </td>
+                <td>
+                  <label class="flex gap-8" style="display:inline-flex; align-items:center; margin-right:12px;">
+                    <input type="radio" name="checklistSituacao_<%= i %>" value="ok" checked> OK
+                  </label>
+                  <label class="flex gap-8" style="display:inline-flex; align-items:center;">
+                    <input type="radio" name="checklistSituacao_<%= i %>" value="avaria"> Avaria
+                  </label>
+                </td>
+                <td><input type="text" name="checklistObservacao" placeholder="Ex.: risco na porta esquerda"></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="form-grupo">
+        <label for="checklistObservacoesGerais">Observações gerais da entrada</label>
+        <textarea id="checklistObservacoesGerais" name="checklistObservacoesGerais" placeholder="Qualquer outra coisa relevante notada na entrada do veículo"></textarea>
+      </div>
+
+      <div class="form-grupo">
+        <label for="fotosChecklist">Fotos do checklist de entrada</label>
+        <input type="file" id="fotosChecklist" name="fotosChecklist" accept="image/*" multiple>
+        <small class="texto-suave">Tire fotos das avarias já existentes — isso vira prova em caso de reclamação depois.</small>
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--cor-borda); margin:20px 0;">
+
+      <div class="form-grupo">
+        <label for="leitorCodigoOS">Código da peça / código de barras</label>
+        <div class="flex gap-8">
+          <input type="text" id="leitorCodigoOS" placeholder="Digite, leia com o leitor ou use a câmera" autocomplete="off">
+          <button type="button" id="leitorCodigoOS-camera" class="botao botao-secundario" title="Escanear com a câmera">📷</button>
+          <button type="button" id="leitorCodigoOS-botao" class="botao botao-secundario">Adicionar</button>
+        </div>
+        <small id="leitorCodigoOS-feedback"></small>
+      </div>
+
+      <div class="flex-entre mb-16">
+        <h3 class="mb-0">Peças utilizadas</h3>
+        <button type="button" class="botao botao-secundario botao-pequeno" onclick="adicionarItemDinamico('itensPecas', 'templatePeca')">+ Adicionar peça</button>
+      </div>
+      <div id="itensPecas" class="linha-itens mb-16"></div>
+
+      <div class="flex-entre mb-16">
+        <h3 class="mb-0">Serviços realizados</h3>
+        <button type="button" class="botao botao-secundario botao-pequeno" onclick="adicionarItemDinamico('itensServicos', 'templateServico')">+ Adicionar serviço</button>
+      </div>
+      <div id="itensServicos" class="linha-itens mb-16"></div>
+
+      <div class="form-grupo" style="max-width:220px;">
+        <label for="desconto">Desconto (R$)</label>
+        <input type="number" step="0.01" id="desconto" name="desconto" value="0">
+      </div>
+
+      <div class="flex gap-12">
+        <button type="submit" class="botao botao-primario">Criar Ordem de Serviço</button>
+        <a href="/ordens-servico" class="botao botao-secundario">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<template id="templatePeca">
+  <div class="item-dinamico">
+    <select name="pecaId" onchange="preencherPrecoPeca(this)">
+      <option value="">Selecione a peça</option>
+      <% pecas.forEach(p => { %>
+        <option value="<%= p._id %>" data-preco="<%= p.precoVenda %>"><%= p.nome %> (estoque: <%= p.quantidade %>)</option>
+      <% }) %>
+    </select>
+    <input type="number" name="pecaQuantidade" placeholder="Qtd" min="1" value="1">
+    <input type="number" step="0.01" class="campo-preco" placeholder="Preço unit." readonly>
+    <button type="button" class="remover-item" onclick="removerItemDinamico(this)">✕</button>
+  </div>
+</template>
+
+<template id="templateServico">
+  <div class="item-dinamico item-dinamico-servico">
+    <input type="text" name="servicoDescricao" placeholder="Descrição do serviço">
+    <input type="number" step="0.01" name="servicoValor" placeholder="Valor (R$)">
+    <button type="button" class="remover-item" onclick="removerItemDinamico(this)">✕</button>
+  </div>
+</template>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    ativarLeitorCodigoBarras({
+      inputId: 'leitorCodigoOS',
+      containerId: 'itensPecas',
+      templateId: 'templatePeca',
+      selectName: 'pecaId',
+      endpointBase: '/estoque/buscar'
+    });
+
+    ativarBuscaPorPlacaNaOS();
+  });
+
+  /**
+   * Digite a placa > aperta Enter (ou clica "Buscar") > se o veículo já
+   * foi atendido antes por essa oficina, preenche cliente e moto
+   * automaticamente, sem precisar navegar pelos dois selects na mão.
+   */
+  function ativarBuscaPorPlacaNaOS() {
+    const input = document.getElementById('buscaPlacaOS');
+    const botao = document.getElementById('buscaPlacaOS-botao');
+    const feedback = document.getElementById('buscaPlacaOS-feedback');
+    if (!input || !botao) return;
+
+    async function buscar() {
+      const placa = input.value.trim();
+      if (!placa) return;
+
+      input.disabled = true;
+      botao.disabled = true;
+      feedback.classList.remove('texto-erro');
+      feedback.textContent = 'Buscando...';
+
+      try {
+        const resposta = await fetch(`/ordens-servico/buscar-por-placa/${encodeURIComponent(placa)}`);
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.sucesso || !dados.veiculo) {
+          feedback.classList.add('texto-erro');
+          feedback.textContent = dados.mensagem || 'Veículo não encontrado. Selecione manualmente abaixo.';
+          return;
+        }
+
+        const v = dados.veiculo;
+
+        // Seleciona o cliente e espera carregar as motos dele antes de
+        // selecionar a moto certa (carregarMotosDoCliente é assíncrona).
+        const selectCliente = document.getElementById('cliente');
+        selectCliente.value = v.cliente._id;
+        await carregarMotosDoCliente(v.cliente._id, 'moto', '/ordens-servico/motos-por-cliente');
+
+        const selectMoto = document.getElementById('moto');
+        selectMoto.value = v._id;
+
+        feedback.classList.remove('texto-erro');
+        feedback.textContent = `✅ ${v.placa} — ${v.marca} ${v.modelo} — Cliente: ${v.cliente.nome}`;
+      } catch (err) {
+        feedback.classList.add('texto-erro');
+        feedback.textContent = 'Erro ao buscar. Selecione manualmente abaixo.';
+      } finally {
+        input.disabled = false;
+        botao.disabled = false;
+      }
+    }
+
+    botao.addEventListener('click', buscar);
+    input.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Enter') {
+        evento.preventDefault();
+        buscar();
+      }
+    });
+  }
+</script>

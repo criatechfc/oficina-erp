@@ -1,0 +1,21 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0">Relatório Financeiro</h2>
+  <a href="/relatorios/financeiro?exportar=excel" class="botao botao-secundario">⬇️ Exportar Excel</a>
+</div>
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Tipo</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th>Vencimento</th><th>Status</th></tr></thead>
+      <tbody>
+        <% contas.forEach(c => { %>
+          <tr>
+            <td><%= c.tipo %></td><td><%= c.descricao %></td><td><%= c.categoria %></td>
+            <td><%= c.valor.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}) %></td>
+            <td><%= new Date(c.vencimento).toLocaleDateString('pt-BR') %></td>
+            <td><%= c.status %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

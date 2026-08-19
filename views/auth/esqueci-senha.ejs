@@ -1,0 +1,26 @@
+<div class="tela-login">
+  <div class="caixa-login">
+    <div class="logo-login">
+      <span class="icone-moto">🏍️</span>
+      <span>Oficina ERP</span>
+    </div>
+    <h1>Recuperar senha</h1>
+    <p class="subtitulo">Informe seu e-mail para receber o link de recuperação</p>
+
+    <% if (mensagemSucesso) { %><div class="alerta alerta-sucesso"><%= mensagemSucesso %></div><% } %>
+    <% if (mensagemErro) { %><div class="alerta alerta-erro"><%= mensagemErro %></div><% } %>
+
+    <form action="/esqueci-senha" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-grupo">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required autofocus>
+      </div>
+      <button type="submit" class="botao botao-primario botao-bloco">Enviar link de recuperação</button>
+    </form>
+
+    <p class="texto-pequeno texto-suave" style="text-align:center; margin-top:18px;">
+      <a href="/login">Voltar ao login</a>
+    </p>
+  </div>
+</div>

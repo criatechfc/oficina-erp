@@ -1,0 +1,16 @@
+<div class="flex-entre mb-16">
+  <h2 class="mt-0 mb-0">Relatório de Motos</h2>
+  <a href="/relatorios/motos?exportar=excel" class="botao botao-secundario">⬇️ Exportar Excel</a>
+</div>
+<div class="painel">
+  <div class="tabela-wrap">
+    <table>
+      <thead><tr><th>Placa</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>KM</th></tr></thead>
+      <tbody>
+        <% motos.forEach(m => { %>
+          <tr><td><%= m.placa %></td><td><%= m.marca %></td><td><%= m.modelo %></td><td><%= m.cliente?.nome || '-' %></td><td><%= m.quilometragem %></td></tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>

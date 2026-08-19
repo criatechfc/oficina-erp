@@ -1,0 +1,64 @@
+<div class="grid-cards" style="grid-template-columns: 1fr 1fr;">
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Meus dados</h2></div>
+    <div class="painel-corpo">
+      <form action="/perfil?_method=PUT" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="flex gap-16 mb-16" style="align-items:center;">
+          <% if (usuarioLogado.foto) { %>
+            <img src="<%= usuarioLogado.foto %>" class="foto-thumb" style="width:70px;height:70px;border-radius:50%;">
+          <% } else { %>
+            <span class="avatar-fallback" style="width:70px;height:70px;font-size:26px;"><%= usuarioLogado.nome.charAt(0).toUpperCase() %></span>
+          <% } %>
+          <div style="flex:1;">
+            <label for="foto">Foto de perfil</label>
+            <input type="file" id="foto" name="foto" accept="image/*">
+          </div>
+        </div>
+
+        <div class="form-grupo">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" required value="<%= usuarioLogado.nome %>">
+        </div>
+        <div class="form-grupo">
+          <label>E-mail</label>
+          <input type="email" value="<%= usuarioLogado.email %>" disabled>
+        </div>
+        <div class="form-grupo">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" name="telefone" value="<%= usuarioLogado.telefone || '' %>">
+        </div>
+        <div class="form-grupo">
+          <label>Perfil de acesso</label>
+          <input type="text" value="<%= usuarioLogado.perfil %>" disabled>
+        </div>
+
+        <button type="submit" class="botao botao-primario">Salvar alterações</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="painel">
+    <div class="painel-cabecalho"><h2>Alterar senha</h2></div>
+    <div class="painel-corpo">
+      <form action="/perfil/senha" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-grupo">
+          <label for="senhaAtual">Senha atual</label>
+          <input type="password" id="senhaAtual" name="senhaAtual" required>
+        </div>
+        <div class="form-grupo">
+          <label for="novaSenha">Nova senha</label>
+          <input type="password" id="novaSenha" name="novaSenha" required minlength="8">
+          <p class="campo-ajuda">Mín. 8 caracteres, com maiúscula, minúscula e número.</p>
+        </div>
+        <div class="form-grupo">
+          <label for="confirmarSenha">Confirmar nova senha</label>
+          <input type="password" id="confirmarSenha" name="confirmarSenha" required minlength="8">
+        </div>
+        <button type="submit" class="botao botao-primario">Alterar senha</button>
+      </form>
+    </div>
+  </div>
+</div>
